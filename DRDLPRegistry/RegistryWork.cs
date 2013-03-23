@@ -39,6 +39,48 @@ namespace DRDLPRegistry
 			FTYPE
 		}
 
+		public static bool OpenWithMenuEnabled
+		{
+			get { return OpenWithMenuState(); }
+			set { ChageStateOfOpenWithMenu(value); }
+		}
+
+		private static void ChageStateOfOpenWithMenu(bool showOpenWithMenu)
+		{
+			var openWithMenu = Registry.ClassesRoot.OpenSubKey(REGISTRY_CLASSES_ROOT_OPEN_WITH_MENU, true);
+
+			if (openWithMenu == null)
+				throw new Exception("No open with menu key found");
+
+			if (showOpenWithMenu)
+			{
+				var backUpKeyValue = openWithMenu.GetValue(REGISTRY_BACK_UP_KEY_NAME_TO_ADD);
+
+				if (backUpKeyValue != null)
+				{
+					openWithMenu.SetValue(string.Empty, backUpKeyValue);
+					openWithMenu.DeleteValue(REGISTRY_BACK_UP_KEY_NAME_TO_ADD);
+				}
+			}
+			else
+			{
+				var defaultKeyValue = openWithMenu.GetValue(string.Empty) as string;
+
+				if (!string.IsNullOrEmpty(defaultKeyValue))
+				{
+					openWithMenu.SetValue(REGISTRY_BACK_UP_KEY_NAME_TO_ADD, defaultKeyValue, RegistryValueKind.String);
+					openWithMenu.SetValue(string.Empty, string.Empty);
+				}
+			}
+			Registry.ClassesRoot.Close();
+		}
+
+		private static bool OpenWithMenuState()
+		{
+			var openWithMenu = Registry.ClassesRoot.OpenSubKey(REGISTRY_CLASSES_ROOT_OPEN_WITH_MENU, true);
+			return openWithMenu != null && string.IsNullOrEmpty(openWithMenu.GetValue(string.Empty) as string);
+		}
+
 		private static bool IsAssociationChanged(string selectedFileType)
 		{
 			if (string.IsNullOrEmpty(selectedFileType))
@@ -269,6 +311,7 @@ namespace DRDLPRegistry
 			}
 			return false;
 		}
+		
 
 		public static IEnumerable<KeyValuePair<string, bool>> GetAllFileExtingtion()
 		{
@@ -279,18 +322,19 @@ namespace DRDLPRegistry
 				: null;
 		}
 
-		public static void ChageFileAssociation(IEnumerable<string> selectedFleTypes, string fullPathToTheAssociatedProgram)
+
+		public static void ChageFileAssociation(IEnumerable<string> selectedFileTypes, string fullPathToTheAssociatedProgram)
 		{
 			if (string.IsNullOrEmpty(fullPathToTheAssociatedProgram))
 				throw new ArgumentException("fullPathToTheAssociatedProgram can`t be empty or null");
 
-			if (selectedFleTypes == null)
-				throw new ArgumentNullException("selectedFleTypes");
+			if (selectedFileTypes == null)
+				throw new ArgumentNullException("selectedFileTypes");
 
-			if (!selectedFleTypes.Any())
-				throw new AggregateException("selectedFleTypes cant be empty");
+			if (!selectedFileTypes.Any())
+				throw new AggregateException("selectedFileTypes cant be empty");
 
-			foreach (var fileType in selectedFleTypes)
+			foreach (var fileType in selectedFileTypes)
 			{
 				ChageFileAssociation(fileType, fullPathToTheAssociatedProgram);
 			}
@@ -360,6 +404,21 @@ namespace DRDLPRegistry
 			Registry.CurrentUser.Close();
 		}
 
+
+		public static void RestoreOriginalFileAssociation(IEnumerable<string> selectedFileTypes)
+		{
+			if (selectedFileTypes == null)
+				throw new ArgumentNullException("selectedFileTypes");
+
+			if (!selectedFileTypes.Any())
+				throw new AggregateException("selectedFileTypes cant be empty");
+
+			foreach (var fileType in selectedFileTypes)
+			{
+				RestoreOriginalFileAssociation(fileType);
+			}
+		}
+
 		public static void RestoreOriginalFileAssociation(string selectedFileType)
 		{
 			if (string.IsNullOrEmpty(selectedFileType))
@@ -400,41 +459,6 @@ namespace DRDLPRegistry
 
 			CreateKeyValuesTree(aggregator, selectedFileType, Registry.CurrentUser.OpenSubKey(REGISTRY_FILE_ASSOCIATION_KEY_PATH, true));
 			Registry.CurrentUser.Close();
-		}
-
-		public static void DeleteOpenWithMenu()
-		{
-			var openWithMenu = Registry.ClassesRoot.OpenSubKey(REGISTRY_CLASSES_ROOT_OPEN_WITH_MENU, true);
-
-			if (openWithMenu == null)
-				throw new Exception("No open with menu key found");
-
-			var defaultKeyValue = openWithMenu.GetValue(string.Empty) as string;
-			if (string.IsNullOrEmpty(defaultKeyValue))
-				return;
-
-			openWithMenu.SetValue(REGISTRY_BACK_UP_KEY_NAME_TO_ADD, defaultKeyValue, RegistryValueKind.String);
-
-			openWithMenu.SetValue(string.Empty, string.Empty);
-
-			Registry.ClassesRoot.Close();
-		}
-
-		public static void RestoreOpenWithMenu()
-		{
-			var openWithMenu = Registry.ClassesRoot.OpenSubKey(REGISTRY_CLASSES_ROOT_OPEN_WITH_MENU, true);
-
-			if (openWithMenu == null)
-				throw new Exception("No open with menu key found");
-
-			var backUpKeyValue = openWithMenu.GetValue(REGISTRY_BACK_UP_KEY_NAME_TO_ADD);
-
-			if (backUpKeyValue == null)
-				throw new Exception("No back up key found");
-
-			openWithMenu.SetValue(string.Empty, backUpKeyValue);
-			openWithMenu.DeleteValue(REGISTRY_BACK_UP_KEY_NAME_TO_ADD);
-			Registry.ClassesRoot.Close();
 		}
 	}
 }
