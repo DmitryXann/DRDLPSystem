@@ -311,7 +311,17 @@ namespace DRDLPRegistry
 			}
 			return false;
 		}
-		
+
+		public static string GetDefaultAssociationProgramPath(string selectedFileType)
+		{
+			if (string.IsNullOrEmpty(selectedFileType))
+				throw new ArgumentException("selectedFileType can`t be empty or null");
+
+			if (selectedFileType[0] != '.')
+				throw new ArgumentException("selectedFileType need to be in full format, example: .docx");
+
+			return GetCMDCommandCutResult(CMDCommands.FTYPE, GetCMDCommandCutResult(CMDCommands.ASSOC, selectedFileType));
+		}
 
 		public static IEnumerable<KeyValuePair<string, bool>> GetAllFileExtingtion()
 		{
@@ -371,11 +381,8 @@ namespace DRDLPRegistry
 				throw new ArgumentException("selectedFileType need to be in full format, example: .docx");
 
 			var extingtionNickName = GetCMDCommandCutResult(CMDCommands.ASSOC, selectedFileType);
-
 			var extingtionIconValue = GetDefaultAssociationImage(selectedFileType);
-
 			var expectedFileExtingtionPath = REGISTRY_FILE_ASSOCIATION_KEY_PATH + Path.DirectorySeparatorChar + selectedFileType;
-
 			var currentAssociationKey = Registry.CurrentUser.OpenSubKey(expectedFileExtingtionPath);
 
 			if (currentAssociationKey != null)
