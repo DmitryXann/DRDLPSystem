@@ -1,6 +1,6 @@
 DRDLPSystem
 ===========
-WARNING! System is in early developmental stage, is not ready to use and code is not fully commented yet.
+WARNING! System is in early development stage, not ready to use and code is not fully commented yet.
 
 Document related DLP system use hardware PC information to transform documents in unique way to prevent information leakage
 Copyright (C) 2013  Dmitry Tomayly
