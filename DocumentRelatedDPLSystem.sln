@@ -7,11 +7,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TEST_CONSOLE", "TEST_CONSOL
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRDLPNet4_5", "DRDLPNet4.5\DRDLPNet4_5.csproj", "{8CAC77C3-AC5C-4D8D-B018-61D554635257}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRDLPClientNet3_5", "DRDLPNet\DRDLPClientNet3_5.csproj", "{86D8C496-5A9C-4B25-AD93-0F43679F306D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRDLPClientNet4", "DRDLPNet\DRDLPClientNet4.csproj", "{86D8C496-5A9C-4B25-AD93-0F43679F306D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRDLPAssociationEdit", "DLPAssociationEdit\DRDLPAssociationEdit.csproj", "{A1011BC3-4293-4346-A699-E88C27157ADC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRDLPRegistry", "DRDLPRegistry\DRDLPRegistry.csproj", "{4C2A3903-895F-4B5E-B5C9-1DF088DBA7DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRDLPFileTransformation", "DRDLPFileTransformation\DRDLPFileTransformation.csproj", "{857AD7A7-57B0-49C2-9E16-B168F05DB493}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,6 +45,10 @@ Global
 		{4C2A3903-895F-4B5E-B5C9-1DF088DBA7DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C2A3903-895F-4B5E-B5C9-1DF088DBA7DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4C2A3903-895F-4B5E-B5C9-1DF088DBA7DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{857AD7A7-57B0-49C2-9E16-B168F05DB493}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{857AD7A7-57B0-49C2-9E16-B168F05DB493}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{857AD7A7-57B0-49C2-9E16-B168F05DB493}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{857AD7A7-57B0-49C2-9E16-B168F05DB493}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
