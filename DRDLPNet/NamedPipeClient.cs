@@ -9,7 +9,7 @@ using System.Text;
 
 namespace DRDLPClientOnlyNet4
 {
-	public static class NamedPipeClientNet4
+	public class NamedPipeClientNet4
 	{
 		private const string SERVER_NAME = ".";
 
@@ -47,7 +47,7 @@ namespace DRDLPClientOnlyNet4
 		private static IEnumerable<string> GetCPUSerialInfo { get { return GetDeviceInfo("Win32_Processor", "ProcessorId").Where(el => el != null).Select(el => el.ToString().Trim()); } }
 
 		public delegate void FileReadySignature(string fileName, Action selectedAction);
-		public static event FileReadySignature FileReady;
+		public event FileReadySignature FileReady;
 
 		private static IEnumerable<object> GetDeviceInfo(string fromWin32Class, string classItemAdd)
 		{
@@ -92,7 +92,7 @@ namespace DRDLPClientOnlyNet4
 			}
 		}
 
-		public static void StartConversation(string personalPipeName, string fileName,  Action selectedAction)
+		public void StartConversation(string personalPipeName, string fileName,  Action selectedAction)
 		{
 			if (string.IsNullOrEmpty(personalPipeName))
 				throw new ArgumentException("personalPipeName can`t be empty or null");
