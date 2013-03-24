@@ -17,7 +17,6 @@ namespace DRDLPClientOnlyNet4
 		{
 			GetEncryptedFile,
 			GetDecryptedFile,
-			FileReady
 		}
 
 		private static string _lisenerServerPipeName;
