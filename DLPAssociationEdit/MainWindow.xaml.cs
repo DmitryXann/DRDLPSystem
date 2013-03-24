@@ -14,7 +14,7 @@ namespace DRDLPAssociationEdit
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private const string TEST_ASSOCIATION_PROGRAM = @"C:\Windows\SysWow64\cmd.exe";
+		private const string TEST_ASSOCIATION_PROGRAM = @"C:\Users\Admin\DRDLPSystem\DRDLPFileTransformation\bin\Debug\DRDLPFileTransformation.exe";
 		private const string STATUS_LABEL_OPEN_WITH_MENU_TEXT = "Open with menu is ";
 		private const string STATUS_LABEL_OPEN_WITH_MENU_ENAMBLED_TEXT = "enabled.";
 		private const string STATUS_LABEL_OPEN_WITH_MENU_DISABLED_TEXT = "disabled.";
