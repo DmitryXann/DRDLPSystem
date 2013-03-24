@@ -80,29 +80,9 @@ namespace DRDLPFileTransformation
 
 			var namedPipeClient = new NamedPipeClientNet4();
 
-			namedPipeClient.FileReady += (name, action) =>
-				{
-					var defaultAssociatedApplication = RegistryWork.GetDefaultAssociationProgramPath(fileExtingtion);
-
-					if (string.IsNullOrEmpty(defaultAssociatedApplication))
-						return;
-
-					var newProcess = new Process
-						{
-							StartInfo =
-								{
-									FileName = defaultAssociatedApplication,
-									Arguments = name
-								}
-						};
-					newProcess.Start();
-
-					newProcess.WaitForExit();
-				};
-
 			namedPipeClient.StartConversation(NamedPipeClientNet4.GetPerconalConversationPipeName(), selctedFile, NamedPipeClientNet4.Action.GetDecryptedFile);
 
-			//File.WriteAllBytes(selectedFile + "." + "zip" + Path.GetExtension(selectedFile), new FileContainer().GetSourceFileBytes(selectedFile + "." + "zip").ToArray());
+			NOTIFY_ICON.Dispose();
 		}
 	}
 }
