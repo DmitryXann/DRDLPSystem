@@ -4,12 +4,12 @@ using System.IO.Pipes;
 
 namespace DRDLPNet4_5.NamedPipes
 {
-	public static class NamedPipeClient
+	public class NamedPipeClient
 	{
 		private const string SERVER_NAME = ".";
 		
 		public delegate void FileReadySignature(string fileName, NamedPipesSharedData.Action selectedAction);
-		public static event FileReadySignature FileReady;
+		public event FileReadySignature FileReady;
 
 		public static string GetPerconalConversationPipeName()
 		{
@@ -29,7 +29,7 @@ namespace DRDLPNet4_5.NamedPipes
 			}
 		}
 
-		public static void StartConversation(string personalPipeName, string fileName,  NamedPipesSharedData.Action selectedAction)
+		public void StartConversation(string personalPipeName, string fileName,  NamedPipesSharedData.Action selectedAction)
 		{
 			if (string.IsNullOrEmpty(personalPipeName))
 				throw new ArgumentException("personalPipeName can`t be empty or null");
