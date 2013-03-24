@@ -322,6 +322,25 @@ namespace DRDLPRegistry
 				: null;
 		}
 
+		public static string GetDefaultAssociationImage(string selectedFileType)
+		{
+			if (string.IsNullOrEmpty(selectedFileType))
+				throw new ArgumentException("selectedFileType can`t be empty or null");
+
+			if (selectedFileType[0] != '.')
+				throw new ArgumentException("selectedFileType need to be in full format, example: .docx");
+
+			var extingtionNickName = GetCMDCommandCutResult(CMDCommands.ASSOC, selectedFileType);
+			
+			if (!string.IsNullOrEmpty(extingtionNickName))
+			{
+				var extingtionIconKey = Registry.ClassesRoot.OpenSubKey(extingtionNickName + Path.DirectorySeparatorChar + REGISTRY_ICON_KEY_NAME);
+
+				if (extingtionIconKey != null)
+					return extingtionIconKey.GetValue(string.Empty).ToString();
+			}
+			return string.Empty;
+		}
 
 		public static void ChageFileAssociation(IEnumerable<string> selectedFileTypes, string fullPathToTheAssociatedProgram)
 		{
@@ -352,15 +371,8 @@ namespace DRDLPRegistry
 				throw new ArgumentException("selectedFileType need to be in full format, example: .docx");
 
 			var extingtionNickName = GetCMDCommandCutResult(CMDCommands.ASSOC, selectedFileType);
-			var extingtionIconValue = string.Empty;
 
-			if (!string.IsNullOrEmpty(extingtionNickName))
-			{
-				var extingtionIconKey = Registry.ClassesRoot.OpenSubKey(extingtionNickName + Path.DirectorySeparatorChar + REGISTRY_ICON_KEY_NAME);
-
-				if (extingtionIconKey != null)
-					extingtionIconValue = extingtionIconKey.GetValue(string.Empty).ToString();
-			}
+			var extingtionIconValue = GetDefaultAssociationImage(selectedFileType);
 
 			var expectedFileExtingtionPath = REGISTRY_FILE_ASSOCIATION_KEY_PATH + Path.DirectorySeparatorChar + selectedFileType;
 
