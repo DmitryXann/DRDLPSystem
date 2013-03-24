@@ -7,9 +7,9 @@ using System.Management;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace DRDLPClientOnlyNet3_5
+namespace DRDLPClientOnlyNet4
 {
-	public static class NamedPipeClientNet35
+	public static class NamedPipeClientNet4
 	{
 		private const string SERVER_NAME = ".";
 

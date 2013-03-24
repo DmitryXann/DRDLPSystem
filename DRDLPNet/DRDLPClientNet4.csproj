@@ -7,9 +7,9 @@
     <ProjectGuid>{86D8C496-5A9C-4B25-AD93-0F43679F306D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DRDLPClientOnlyNet3_5</RootNamespace>
-    <AssemblyName>DRDLPClientOnlyNet3_5</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <RootNamespace>DRDLPClientOnlyNet4</RootNamespace>
+    <AssemblyName>DRDLPClientOnlyNet4</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
