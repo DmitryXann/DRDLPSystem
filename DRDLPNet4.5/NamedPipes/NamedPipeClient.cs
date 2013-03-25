@@ -8,8 +8,8 @@ namespace DRDLPNet4_5.NamedPipes
 	{
 		private const string SERVER_NAME = ".";
 		
-		public delegate void FileReadySignature(string fileName, NamedPipesSharedData.Action selectedAction);
-		public event FileReadySignature FileReady;
+		//public delegate void FileReadySignature(string fileName, NamedPipesSharedData.NameedPipesServerAction selectedAction);
+		//public event FileReadySignature FileReady;
 
 		public static string GetPerconalConversationPipeName()
 		{
@@ -29,7 +29,7 @@ namespace DRDLPNet4_5.NamedPipes
 			}
 		}
 
-		public void StartConversation(string personalPipeName, string fileName,  NamedPipesSharedData.Action selectedAction)
+		public void StartConversation(string personalPipeName, string fileName,  NamedPipesSharedData.NameedPipesServerAction selectedAction)
 		{
 			if (string.IsNullOrEmpty(personalPipeName))
 				throw new ArgumentException("personalPipeName can`t be empty or null");
@@ -56,9 +56,10 @@ namespace DRDLPNet4_5.NamedPipes
 				pipeWriter.Flush();
 				namingPipeClient.WaitForPipeDrain();
 
-				var fileIsReady = pipeReader.ReadLine();
+				/*var fileIsReady = pipeReader.ReadLine();
 				if ((FileReady != null) && !string.IsNullOrEmpty(fileIsReady))
 					FileReady(fileIsReady, selectedAction);
+				 */
 			}
 		}
 	}

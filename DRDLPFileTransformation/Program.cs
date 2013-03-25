@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows.Forms;
 using DRDLPRegistry;
-using DRDLPClientOnlyNet4;
+using DRDLPNet4_5.FileTranfsormation;
 
 namespace DRDLPFileTransformation
 {
@@ -13,6 +15,7 @@ namespace DRDLPFileTransformation
 	{
 		private const char ICON_CONTAINER_ICON_NUMBER_SEPARATOR = ',';
 		private const int BALOON_TIME_OUT = 400;
+		private const uint TIMER_TIME_OUT = 450;
 
 		[DllImport("Shell32.dll", EntryPoint = "ExtractIconExW", CharSet = CharSet.Unicode, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
 		private static extern int ExtractIconEx(string fullFilePath, int iconIndex, out IntPtr largeIconVersion, out IntPtr smallIconVersion, int iconsQuantity);
@@ -75,11 +78,32 @@ namespace DRDLPFileTransformation
 
 			NOTIFY_ICON.ShowBalloonTip(BALOON_TIME_OUT);
 
-			var namedPipeClient = new NamedPipeClientNet4();
+			var disposeNotificationIcon = new System.Threading.Timer(el => NOTIFY_ICON.Dispose(), null, TIMER_TIME_OUT, Timeout.Infinite);
 
-			namedPipeClient.StartConversation(NamedPipeClientNet4.GetPerconalConversationPipeName(), selctedFile, NamedPipeClientNet4.Action.GetDecryptedFile);
+			var fileTransformation = new FileTransformation(selctedFile);
 
-			NOTIFY_ICON.Dispose();
+			if (fileTransformation.IsFileProtected)
+				fileTransformation.DecryptAndOpenFile();
+			else
+			{
+				var defaultAssociatedApplication = RegistryWork.GetDefaultAssociationProgramPath(Path.GetExtension(selctedFile));
+
+				if (string.IsNullOrEmpty(defaultAssociatedApplication))
+					return;
+
+				var newProcess = new Process
+					{
+						StartInfo =
+							{
+								FileName = defaultAssociatedApplication,
+								Arguments = selctedFile,
+							}
+					};
+				newProcess.Start();
+				newProcess.WaitForExit();
+
+				fileTransformation.EncryptFile();
+			}
 		}
 	}
 }

@@ -48,6 +48,7 @@
     <Compile Include="Cryptography\DataCryptography.cs" />
     <Compile Include="DataSource\SystemInformation.cs" />
     <Compile Include="FileTranfsormation\FileContainer.cs" />
+    <Compile Include="FileTranfsormation\FileTransformation.cs" />
     <Compile Include="NamedPipes\NamedPipeClient.cs" />
     <Compile Include="NamedPipes\NamedPipeServer.cs" />
     <Compile Include="NamedPipes\NamedPipesSharedData.cs" />

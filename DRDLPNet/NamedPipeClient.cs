@@ -45,8 +45,8 @@ namespace DRDLPClientOnlyNet4
 
 		private static IEnumerable<string> GetCPUSerialInfo { get { return GetDeviceInfo("Win32_Processor", "ProcessorId").Where(el => el != null).Select(el => el.ToString().Trim()); } }
 
-		public delegate void FileReadySignature(string fileName, Action selectedAction);
-		public event FileReadySignature FileReady;
+		//public delegate void FileReadySignature(string fileName, Action selectedAction);
+		//public event FileReadySignature FileReady;
 
 		private static IEnumerable<object> GetDeviceInfo(string fromWin32Class, string classItemAdd)
 		{
@@ -118,9 +118,9 @@ namespace DRDLPClientOnlyNet4
 				pipeWriter.Flush();
 				namingPipeClient.WaitForPipeDrain();
 
-				var fileIsReady = pipeReader.ReadLine();
-				if ((FileReady != null) && !string.IsNullOrEmpty(fileIsReady))
-					FileReady(fileIsReady, selectedAction);
+				//var fileIsReady = pipeReader.ReadLine();
+				//if ((FileReady != null) && !string.IsNullOrEmpty(fileIsReady))
+				//	FileReady(fileIsReady, selectedAction);
 			}
 		}
 	}

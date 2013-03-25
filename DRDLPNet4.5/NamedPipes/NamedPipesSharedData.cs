@@ -25,7 +25,7 @@ namespace DRDLPNet4_5.NamedPipes
 		} 
 		 */
 
-		public enum Action
+		public enum NameedPipesServerAction
 		{
 			GetEncryptedFile,
 			GetDecryptedFile,

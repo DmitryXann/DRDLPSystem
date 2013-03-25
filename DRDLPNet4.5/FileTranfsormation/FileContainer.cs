@@ -161,7 +161,9 @@ namespace DRDLPNet4_5.FileTranfsormation
 		private uint _startedReCretionThreads;
 		private ConcurrentBag<KeyValuePair<int, string>> _preperadFiles;
 		private ConcurrentBag<KeyValuePair<int, List<byte>>> _sourceDecryptedFileData;
- 
+
+		public const string FILE_TRANSFORMED_FLAG = "DocumentRelatedDLPSystemFile"; //needs refactoring 
+
 		public FileContainer()
 		{
 			_filesSizeInfoes = int.Parse(DataCryptography.GetHashSum(CpuSerial + MBName, DataCryptography.HashSum.Md5).Substring(0, FILE_SIZE_TAKE_ELEMENTS_FROM_HASH), NumberStyles.HexNumber);
@@ -297,7 +299,10 @@ namespace DRDLPNet4_5.FileTranfsormation
 						zipEntrySteam.Close();
 					}
 				}
+
+				zipFile.CreateEntry(FILE_TRANSFORMED_FLAG);
 			}
+
 			return expectedFullFilePath;
 		}
 		
@@ -311,7 +316,12 @@ namespace DRDLPNet4_5.FileTranfsormation
 			var accumulator = new List<string>();
 			using (var zipFile = ZipFile.OpenRead(fileName))
 			{
-				foreach (var zipEntry in zipFile.Entries.OrderBy(el => uint.Parse(el.Name)))
+				var fileTransformedFlag = zipFile.GetEntry(FILE_TRANSFORMED_FLAG);
+
+				if (fileTransformedFlag == null)
+					throw new FileLoadException("No file specific flag was found, not correct file?");
+
+				foreach (var zipEntry in zipFile.Entries.Where(el => el != fileTransformedFlag).OrderBy(el => uint.Parse(el.Name)))
 				{
 					using (var zipEntryDataSteam = new StreamReader(zipEntry.Open()))
 					{
