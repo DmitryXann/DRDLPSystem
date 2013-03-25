@@ -83,12 +83,6 @@ namespace DRDLPRegistry
 
 		private static bool IsAssociationChanged(string selectedFileType)
 		{
-			if (string.IsNullOrEmpty(selectedFileType))
-				throw new ArgumentException("selectedFileType can`t be empty or null");
-
-			if (selectedFileType[0] != '.')
-				throw new ArgumentException("selectedFileType need to be in full format, example: .docx");
-
 			var selectedAssociationKey = Registry.CurrentUser.OpenSubKey(REGISTRY_FILE_ASSOCIATION_KEY_PATH 
 				+ Path.DirectorySeparatorChar + selectedFileType + Path.DirectorySeparatorChar + REGISTRY_USER_EXTINGTION_USER_CHOISE_KEY_NAME);
 
@@ -163,9 +157,6 @@ namespace DRDLPRegistry
 		/// <param name="levelNumber"></param>
 		private static void GetAllSubKeysAndValuesTree(IEnumerable<string> inputData, string keyPath, ref List<object> resultAggregator, int levelNumber = 0)
 		{
-			if (string.IsNullOrEmpty(keyPath))
-				throw new ArgumentException("keyPath can`t be empty or null");
-
 			List<object> selectedLevel;
 
 			if (resultAggregator.Any() && (levelNumber > 0))
@@ -245,12 +236,6 @@ namespace DRDLPRegistry
 		/// <param name="nameAggregator"></param>
 		private static void CreateKeyValuesTree(List<object> keyValueTree, string newHeadername, RegistryKey keyFatherKeyFullPath, string nameAggregator = null)
 		{
-			if (string.IsNullOrEmpty(newHeadername))
-				throw new ArgumentException("newHeadername can`t be empty or null");
-
-			if (keyFatherKeyFullPath == null)
-				throw new ArgumentNullException("keyFatherKeyFullPath");
-
 			if (!keyValueTree.Any())
 				return;
 
