@@ -1,11 +1,18 @@
 ﻿using System;
+using System.Diagnostics;
+using System.DirectoryServices.AccountManagement;
 using System.IO;
 using System.Linq;
+using System.Security;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Threading;
 using System.IO.Pipes;
 using DRDLPNet4_5.Cryptography;
 using DRDLPNet4_5.DataSource;
 using DRDLPNet4_5.FileTranfsormation;
+using DRDLPNet4_5.WindowsAdministation;
+using DRDLPRegistry;
 
 namespace DRDLPNet4_5.NamedPipes
 {
@@ -66,7 +73,6 @@ namespace DRDLPNet4_5.NamedPipes
 			}
 		}
 
-
 		private static void ConversationThread(object conversationThreadPipeName)
 		{
 			var selectedPipeName = conversationThreadPipeName as string;
@@ -101,23 +107,94 @@ namespace DRDLPNet4_5.NamedPipes
 					pipeServerSteam.Disconnect();
 					return;
 				}
+
 				var fileContainer = new FileContainer();
-				
+				var random = new Random(unchecked((int) DateTime.Now.Ticks));
+
 				switch (selectedAction)
 				{
 					case NamedPipesSharedData.Action.GetEncryptedFile:
-						var newFileName = recivedFileName + new Random(unchecked((int) DateTime.Now.Ticks)).Next() + "." + "doc";
-						fileContainer.GetSafeFile(recivedFileName, newFileName, true);
+
+						fileContainer.GetSafeFile(recivedFileName, recivedFileName, true);
+						pipeWriter.WriteLine(recivedFileName);
+						pipeWriter.Flush();
+						pipeServerSteam.WaitForPipeDrain();
+
+						break;
+					case NamedPipesSharedData.Action.GetDecryptedFile:
+
+						var newTempFolder = Path.GetTempPath() + random.Next();
+						var newFileName = newTempFolder + Path.DirectorySeparatorChar + Path.GetFileName(recivedFileName);
+
+						while (Directory.Exists(newTempFolder))
+						{
+							newTempFolder = Path.GetTempPath() + random.Next();
+						}
+
+						var internalUser = Environment.MachineName +
+						                   Path.DirectorySeparatorChar +
+						                   LocalUserAdministation.GetDRDLPSystemUserName;
+
+						var securityRules = new DirectorySecurity();
+						var securityAccesRule = new FileSystemAccessRule(internalUser, FileSystemRights.FullControl, AccessControlType.Allow);
+						var createdDirectory = Directory.CreateDirectory(newTempFolder);
+
+						securityRules.AddAccessRule(securityAccesRule);
+						
+						File.WriteAllBytes(newFileName, fileContainer.GetSourceFileBytes(recivedFileName).ToArray());
+
 						pipeWriter.WriteLine(newFileName);
 						pipeWriter.Flush();
 						pipeServerSteam.WaitForPipeDrain();
-						break;
-					case NamedPipesSharedData.Action.GetDecryptedFile:
-						var newFile = recivedFileName +  new Random(unchecked((int) DateTime.Now.Ticks)).Next() + "." + "docx";
-						File.WriteAllBytes(newFile, fileContainer.GetSourceFileBytes(recivedFileName).ToArray());
-						pipeWriter.WriteLine(newFile);
-						pipeWriter.Flush();
-						pipeServerSteam.WaitForPipeDrain();
+
+						var defaultAssociatedApplication = RegistryWork.GetDefaultAssociationProgramPath(Path.GetExtension(recivedFileName));
+
+						if (string.IsNullOrEmpty(defaultAssociatedApplication))
+							return;
+
+						createdDirectory.SetAccessControl(securityRules);
+
+						var securityString = new SecureString();
+
+						foreach (var userPasswordChars in LocalUserAdministation.GetDRDLPSystemUserPassword)
+						{
+							securityString.AppendChar(userPasswordChars);
+						}
+
+						if (!SecondLoginServiceManagement.IsSecondLoginServiceRunning)
+							SecondLoginServiceManagement.StartSecondLoginService();
+
+						if (!LocalUserAdministation.IsDRDLPSystemUserEnabled)
+							LocalUserAdministation.ActivateUserAccount();
+
+						var newProcess = new Process
+							{
+								StartInfo =
+									{
+										UserName = LocalUserAdministation.GetDRDLPSystemUserName,
+										Password = securityString,
+										FileName = defaultAssociatedApplication,
+										Arguments = newFileName,
+										Domain = Environment.MachineName,
+										UseShellExecute = false,
+										WorkingDirectory = createdDirectory.FullName
+									}
+							};
+
+						newProcess.Start();
+						newProcess.WaitForExit();
+
+						securityRules.RemoveAccessRule(securityAccesRule);
+						securityRules.AddAccessRule(new FileSystemAccessRule(UserPrincipal.Current.Name, FileSystemRights.FullControl, AccessControlType.Allow));
+
+						createdDirectory.SetAccessControl(securityRules);
+
+						File.Delete(recivedFileName);
+						fileContainer.GetSafeFile(newFileName, recivedFileName, true);
+
+						File.Delete(newFileName);
+						createdDirectory.Delete(true);
+
 						break;
 					default:
 						pipeServerSteam.Disconnect();

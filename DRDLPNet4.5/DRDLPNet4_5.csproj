@@ -54,7 +54,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WindowsAdministation\LocalUserAdministation.cs" />
     <Compile Include="WindowsAdministation\SecondLoginServiceManagement.cs" />
-    <Compile Include="WindowsAdministation\ServiceHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DRDLPRegistry\DRDLPRegistry.csproj">

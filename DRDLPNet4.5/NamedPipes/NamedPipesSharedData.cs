@@ -29,7 +29,7 @@ namespace DRDLPNet4_5.NamedPipes
 		{
 			GetEncryptedFile,
 			GetDecryptedFile,
-			FileReady
+			//FileReady
 		}
 
 		private static string _lisenerServerPipeName;
