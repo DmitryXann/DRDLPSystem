@@ -14,7 +14,7 @@ namespace DRDLPRegistry
 		private const char COMMAND_SEPARATOR = ' ';
 		private const char COMMMAND_OUTPUT_RESULT_SEPARATOR = '=';
 		private const char COMMAND_OUTPUT_STRING_QUOTES_START = '"';
-		private const string COMMAND_OUTPUT_STRING_QUOTES_END = "\" ";
+		private const string COMMAND_OUTPUT_STRING_END = ".exe";
 
 		private const string REGISTRY_FILE_ASSOCIATION_KEY_PATH = @"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts";
 		private const string REGISTRY_BACK_UP_KEY_NAME_TO_ADD = "DRDLPBackUp";
@@ -123,9 +123,16 @@ namespace DRDLPRegistry
 			if (neededCommand == CMDCommands.ASSOC)
 				return outputResult.Substring(outputResult.IndexOf(COMMMAND_OUTPUT_RESULT_SEPARATOR) + 1);
 
-			var startIndex = outputResult.IndexOf(COMMAND_OUTPUT_STRING_QUOTES_START) + 1;
+			var startIndex = outputResult.IndexOf(COMMMAND_OUTPUT_RESULT_SEPARATOR) + 1;
+			var associatedProgram = outputResult.ToLower().IndexOf(COMMAND_OUTPUT_STRING_END);
 
-			return outputResult.Substring(startIndex, outputResult.IndexOf(COMMAND_OUTPUT_STRING_QUOTES_END) - startIndex);
+			if (outputResult[startIndex] == COMMAND_OUTPUT_STRING_QUOTES_START)
+				startIndex++;
+
+			if (associatedProgram > startIndex)
+				return outputResult.Substring(startIndex, (associatedProgram + COMMAND_OUTPUT_STRING_END.Length) - startIndex);
+
+			return string.Empty;
 		}
 
 		/// <summary>
@@ -296,6 +303,7 @@ namespace DRDLPRegistry
 			}
 			return false;
 		}
+
 
 		public static string GetDefaultAssociationProgramPath(string selectedFileType)
 		{

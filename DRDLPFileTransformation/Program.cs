@@ -14,6 +14,8 @@ namespace DRDLPFileTransformation
 	static class Program
 	{
 		private const char ICON_CONTAINER_ICON_NUMBER_SEPARATOR = ',';
+		private const string ICON_DEFAULT_EXTINGTION = ".ico";
+
 		private const int BALOON_TIME_OUT = 400;
 		private const uint TIMER_TIME_OUT = 450;
 
@@ -60,18 +62,27 @@ namespace DRDLPFileTransformation
 
 			if (!string.IsNullOrEmpty(selectedImagePath))
 			{
-				int iconIndex;
-				var lastIndexOfIconContainerIconSeparator = selectedImagePath.LastIndexOf(ICON_CONTAINER_ICON_NUMBER_SEPARATOR);
+				var iconResourceExtingtion = Path.GetExtension(selectedImagePath);
 
-				if ((selectedImagePath.LastIndexOf('.') < lastIndexOfIconContainerIconSeparator) 
-					&& int.TryParse(selectedImagePath.Substring(lastIndexOfIconContainerIconSeparator + 1), out iconIndex) )
+				if ((iconResourceExtingtion != null) && (iconResourceExtingtion.ToLower() == ICON_DEFAULT_EXTINGTION))
 				{
-					var extractedIcon = ExtractIconFromResource(selectedImagePath.Substring(0, selectedImagePath.LastIndexOf(ICON_CONTAINER_ICON_NUMBER_SEPARATOR)), iconIndex);
-
-					NOTIFY_ICON.Icon = extractedIcon ?? new Icon(selectedImagePath);
+					NOTIFY_ICON.Icon = new Icon(selectedImagePath);
 				}
 				else
-					NOTIFY_ICON.Icon = new Icon(selectedImagePath);
+				{
+					var lastIndexOfIconContainerIconSeparator = selectedImagePath.LastIndexOf(ICON_CONTAINER_ICON_NUMBER_SEPARATOR);
+					int iconIndex;
+
+					if ((selectedImagePath.LastIndexOf('.') < lastIndexOfIconContainerIconSeparator)
+					    && int.TryParse(selectedImagePath.Substring(lastIndexOfIconContainerIconSeparator + 1), out iconIndex))
+						NOTIFY_ICON.Icon =
+							ExtractIconFromResource(selectedImagePath.Substring(0, selectedImagePath.LastIndexOf(ICON_CONTAINER_ICON_NUMBER_SEPARATOR)), iconIndex) ??
+							Resources.appIco;
+					else
+						NOTIFY_ICON.Icon =
+							ExtractIconFromResource(selectedImagePath, 0) ??
+							Resources.appIco;
+				}
 			}
 			else
 				NOTIFY_ICON.Icon = Resources.appIco;
@@ -91,6 +102,12 @@ namespace DRDLPFileTransformation
 				if (string.IsNullOrEmpty(defaultAssociatedApplication))
 					return;
 
+				if (!File.Exists(defaultAssociatedApplication))
+					defaultAssociatedApplication = Environment.ExpandEnvironmentVariables(defaultAssociatedApplication);
+
+				if (!File.Exists(defaultAssociatedApplication))
+					return;
+
 				var newProcess = new Process
 					{
 						StartInfo =
@@ -99,6 +116,7 @@ namespace DRDLPFileTransformation
 								Arguments = selctedFile,
 							}
 					};
+
 				newProcess.Start();
 				newProcess.WaitForExit();
 
