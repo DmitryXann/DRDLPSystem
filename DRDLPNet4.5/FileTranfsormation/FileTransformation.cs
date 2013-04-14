@@ -110,16 +110,44 @@ namespace DRDLPNet4_5.FileTranfsormation
 			createdDirectory.SetAccessControl(securityRules);
 
 			File.Delete(_selectedFile);
-			fileContainer.GetSafeFile(newFileName, _selectedFile, true);
+			EncryptFile(newFileName, _selectedFile);
 
 			File.Delete(newFileName);
 			createdDirectory.Delete(true);	
 		}
 
+		public void EncryptFile(string fileToEncrypt, string fullPathToNewFile, bool rewriteExistedFile = true)
+		{
+			if (!File.Exists(fileToEncrypt))
+				throw new FileNotFoundException(string.Format("File not found {0}", fileToEncrypt));
+
+			if (string.IsNullOrEmpty(fullPathToNewFile))
+				throw new ArgumentException("expectedFullFilePath cant be empty or null");
+
+			if (File.Exists(fullPathToNewFile) && !rewriteExistedFile)
+				throw new ArgumentException(string.Format("File already exists {0}", fullPathToNewFile));
+
+			var fileContainer = new FileContainer();
+
+			if (File.Exists(fullPathToNewFile))
+				File.Delete(fullPathToNewFile);
+
+			using (var zipFile = ZipFile.Open(fullPathToNewFile, ZipArchiveMode.Create))
+			{
+				foreach (var file in fileContainer.GetSafeFile(fileToEncrypt))
+				{
+					using (var zipEntrySteam = new StreamWriter(zipFile.CreateEntry(file.Key).Open()))
+					{
+						zipEntrySteam.Write(file.Value);
+						zipEntrySteam.Close();
+					}
+				}
+			}
+		}
+
 		public void EncryptFile()
 		{
-			var fileContainer = new FileContainer();
-			fileContainer.GetSafeFile(_selectedFile, _selectedFile, true);
+			EncryptFile(_selectedFile, _selectedFile);
 		}
 	}
 }

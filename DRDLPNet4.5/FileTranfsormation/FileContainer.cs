@@ -159,7 +159,7 @@ namespace DRDLPNet4_5.FileTranfsormation
 		
 		private uint _startedCretionThreads;
 		private uint _startedReCretionThreads;
-		private ConcurrentBag<KeyValuePair<int, string>> _preperadFiles;
+		private ConcurrentBag<KeyValuePair<string, string>> _preperadFiles;
 		private ConcurrentBag<KeyValuePair<int, List<byte>>> _sourceDecryptedFileData;
 
 		public const string FILE_TRANSFORMED_FLAG = "DocumentRelatedDLPSystemFile"; //needs refactoring 
@@ -174,8 +174,8 @@ namespace DRDLPNet4_5.FileTranfsormation
 		#region Threads
 		private void StartFileCreation(object inputData)
 		{
-			var data = (KeyValuePair<int, string>)inputData;
-			_preperadFiles.Add(new KeyValuePair<int, string>(data.Key, ByteArrayToHexString(DataCryptography.GetAESEncryptedMessage(data.Value, _aesKeyValue, _aesIvValue, AES_BLOCK_SIZE))));
+			var data = (KeyValuePair<string, string>)inputData;
+			_preperadFiles.Add(new KeyValuePair<string, string>(data.Key, ByteArrayToHexString(DataCryptography.GetAESEncryptedMessage(data.Value, _aesKeyValue, _aesIvValue, AES_BLOCK_SIZE))));
 			_startedCretionThreads--;
 		}
 
@@ -225,25 +225,12 @@ namespace DRDLPNet4_5.FileTranfsormation
 			return outputData/*.ToString()*/;
 		}
 
-		/// <summary>
-		/// TODO: method return?????
-		/// </summary>
-		/// <param name="fileName"></param>
-		/// <param name="expectedFullFilePath"></param>
-		/// <param name="rewriteExistedFile"></param>
-		/// <returns></returns>
-		public string GetSafeFile(string fileName, string expectedFullFilePath, bool rewriteExistedFile)
+		public IEnumerable<KeyValuePair<string, string>> GetSafeFile(string fileName)
 		{
 			if (!File.Exists(fileName))
 				throw new FileNotFoundException(string.Format("File not found {0}", fileName));
-
-			if (string.IsNullOrEmpty(expectedFullFilePath))
-				throw new ArgumentException("expectedFullFilePath cant be empty or null");
-
-			if (File.Exists(expectedFullFilePath) && !rewriteExistedFile)
-				throw new ArgumentException(string.Format("File already exists {0}", expectedFullFilePath));
-
-			_preperadFiles = new ConcurrentBag<KeyValuePair<int, string>>();
+			
+			_preperadFiles = new ConcurrentBag<KeyValuePair<string, string>>();
 			var inputFileBits = File.ReadAllBytes(fileName).Select(el => Convert.ToString(el, NUMERIC_BASE).PadLeft(ONE_HEX_MAX_ELEMENT_COUNT, '0')).ToList();
 			var inputFileBitsCount = inputFileBits.Count();
 
@@ -258,7 +245,7 @@ namespace DRDLPNet4_5.FileTranfsormation
 					accumulator.Append(inputFileBits[subCount]);
 
 				var newThread = new Thread(StartFileCreation) {Priority = ThreadPriority.Normal};
-				newThread.Start(new KeyValuePair<int, string>(totalCounter++, accumulator.ToString()));
+				newThread.Start(new KeyValuePair<string, string>((totalCounter++).ToString(), accumulator.ToString()));
 
 				_startedCretionThreads++;
 				accumulator.Clear();
@@ -269,7 +256,7 @@ namespace DRDLPNet4_5.FileTranfsormation
 					for (var subCount = counter; subCount < counter + _filesSizeInfoes; subCount++)
 						accumulator.Append(inputFileBits[subCount]);
 
-					_preperadFiles.Add(new KeyValuePair<int, string>(totalCounter++, ByteArrayToHexString(DataCryptography.GetAESEncryptedMessage(accumulator.ToString(), _aesKeyValue, _aesIvValue, AES_BLOCK_SIZE))));
+					_preperadFiles.Add(new KeyValuePair<string, string>((totalCounter++).ToString(), ByteArrayToHexString(DataCryptography.GetAESEncryptedMessage(accumulator.ToString(), _aesKeyValue, _aesIvValue, AES_BLOCK_SIZE))));
 					accumulator.Clear();
 				}
 				 
@@ -279,31 +266,15 @@ namespace DRDLPNet4_5.FileTranfsormation
 			{
 				for (var subCount = counter; subCount < inputFileBitsCount; subCount++)
 					accumulator.Append(inputFileBits[subCount]);
-				_preperadFiles.Add(new KeyValuePair<int, string>(totalCounter, ByteArrayToHexString(DataCryptography.GetAESEncryptedMessage(accumulator.ToString(), _aesKeyValue, _aesIvValue, AES_BLOCK_SIZE))));
+				_preperadFiles.Add(new KeyValuePair<string, string>(totalCounter.ToString(), ByteArrayToHexString(DataCryptography.GetAESEncryptedMessage(accumulator.ToString(), _aesKeyValue, _aesIvValue, AES_BLOCK_SIZE))));
 			}
 
+			_preperadFiles.Add(new KeyValuePair<string, string>(FILE_TRANSFORMED_FLAG, string.Empty));
 
-			if (File.Exists(expectedFullFilePath))
-				File.Delete(expectedFullFilePath);
+			while (_startedCretionThreads > 0)
+				Thread.Sleep(1);
 
-			using (var zipFile = ZipFile.Open(expectedFullFilePath, ZipArchiveMode.Create))
-			{
-				while (_startedCretionThreads > 0)
-					Thread.Sleep(1);
-
-				foreach (var file in _preperadFiles)
-				{
-					using (var zipEntrySteam = new StreamWriter(zipFile.CreateEntry(file.Key.ToString()).Open()))
-					{
-						zipEntrySteam.Write(file.Value);
-						zipEntrySteam.Close();
-					}
-				}
-
-				zipFile.CreateEntry(FILE_TRANSFORMED_FLAG);
-			}
-
-			return expectedFullFilePath;
+			return _preperadFiles;
 		}
 		
 		public IEnumerable<byte> GetSourceFileBytes(string fileName)
