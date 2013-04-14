@@ -19,7 +19,7 @@ namespace DRDLPRegistry
 		private const string REGISTRY_FILE_ASSOCIATION_KEY_PATH = @"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts";
 		private const string REGISTRY_BACK_UP_KEY_NAME_TO_ADD = "DRDLPBackUp";
 		private const string REGISTRY_FILE_ASSOCIATION_AME_TO_ADD = "DRDLP";
-		
+
 
 		private const string REGYSTRY_CLASSES_ROOT_SUBKEYS = @"shell\open\command";
 		private const string REGISTRY_CLASSES_ROOT_ASSOCIATION_ATTRIBUTE = "  %1";
@@ -83,7 +83,7 @@ namespace DRDLPRegistry
 
 		private static bool IsAssociationChanged(string selectedFileType)
 		{
-			var selectedAssociationKey = Registry.CurrentUser.OpenSubKey(REGISTRY_FILE_ASSOCIATION_KEY_PATH 
+			var selectedAssociationKey = Registry.CurrentUser.OpenSubKey(REGISTRY_FILE_ASSOCIATION_KEY_PATH
 				+ Path.DirectorySeparatorChar + selectedFileType + Path.DirectorySeparatorChar + REGISTRY_USER_EXTINGTION_USER_CHOISE_KEY_NAME);
 
 			if (selectedAssociationKey == null)
@@ -162,13 +162,13 @@ namespace DRDLPRegistry
 		/// <param name="keyPath">father key to build tree</param>
 		/// <param name="resultAggregator">key-value tree as return  of method</param>
 		/// <param name="levelNumber"></param>
-		private static void GetAllSubKeysAndValuesTree(IEnumerable<string> inputData, string keyPath, ref List<object> resultAggregator, int levelNumber = 0)
+		private static void GetAllSubKeysAndValuesTree(IEnumerable<string> inputData, string keyPath, ref List<object> resultAggregator, RegistryKey keyFatherKeyFullPath, int levelNumber = 0)
 		{
 			List<object> selectedLevel;
 
 			if (resultAggregator.Any() && (levelNumber > 0))
 			{
-				selectedLevel = ((KeyValuePair<string, object>) resultAggregator.LastOrDefault()).Value as List<object>;
+				selectedLevel = ((KeyValuePair<string, object>)resultAggregator.LastOrDefault()).Value as List<object>;
 
 				for (var levelCounter = 0; levelCounter < levelNumber - 1; levelCounter++)
 				{
@@ -180,33 +180,33 @@ namespace DRDLPRegistry
 					{
 						var neededLevel = selectedLevel.LastOrDefault();
 						if (neededLevel != null)
-							selectedLevel = ((KeyValuePair<string, object>) neededLevel).Value as List<object>;
+							selectedLevel = ((KeyValuePair<string, object>)neededLevel).Value as List<object>;
 					}
 				}
 			}
 			else
 			{
-				var headKeys = Registry.CurrentUser.OpenSubKey(keyPath).GetValueNames();
+				var headKeys = keyFatherKeyFullPath.OpenSubKey(keyPath).GetValueNames();
 
 				selectedLevel = resultAggregator;
 				if (headKeys.Any())
 				{
-					selectedLevel.Insert(0, new KeyValuePair<string, object>(string.Empty, FormKeyValues(keyPath, headKeys)));
+					selectedLevel.Insert(0, new KeyValuePair<string, object>(string.Empty, FormKeyValues(keyPath, headKeys, keyFatherKeyFullPath)));
 				}
 			}
 
 			foreach (var registryKey in inputData)
 			{
 				var expectedKeyPath = keyPath + Path.DirectorySeparatorChar + registryKey;
-				var subKey = Registry.CurrentUser.OpenSubKey(expectedKeyPath);
-				
-				var currentKeyValueNames = Registry.CurrentUser.OpenSubKey(expectedKeyPath).GetValueNames();
+				var subKey = keyFatherKeyFullPath.OpenSubKey(expectedKeyPath);
+
+				var currentKeyValueNames = keyFatherKeyFullPath.OpenSubKey(expectedKeyPath).GetValueNames();
 
 				selectedLevel.Add(currentKeyValueNames.Length == 0
-					                  ? new KeyValuePair<string, object>(registryKey, new List<object>())
-									  : new KeyValuePair<string, object>(registryKey, FormKeyValues(expectedKeyPath, currentKeyValueNames)));
+									  ? new KeyValuePair<string, object>(registryKey, new List<object>())
+									  : new KeyValuePair<string, object>(registryKey, FormKeyValues(expectedKeyPath, currentKeyValueNames, keyFatherKeyFullPath)));
 
-				GetAllSubKeysAndValuesTree(subKey.GetSubKeyNames(), expectedKeyPath, ref resultAggregator, levelNumber + 1);
+				GetAllSubKeysAndValuesTree(subKey.GetSubKeyNames(), expectedKeyPath, ref resultAggregator, keyFatherKeyFullPath, levelNumber + 1);
 			}
 		}
 
@@ -216,7 +216,7 @@ namespace DRDLPRegistry
 		/// <param name="expectedKeyPath"></param>
 		/// <param name="currentKeyValueNames"></param>
 		/// <returns></returns>
-		private static IEnumerable<object> FormKeyValues(string expectedKeyPath, IEnumerable<string> currentKeyValueNames)
+		private static IEnumerable<object> FormKeyValues(string expectedKeyPath, IEnumerable<string> currentKeyValueNames, RegistryKey keyFatherKeyFullPath)
 		{
 			if (string.IsNullOrEmpty(expectedKeyPath) || (currentKeyValueNames == null) || (!currentKeyValueNames.Any()))
 				return new List<object>();
@@ -225,7 +225,7 @@ namespace DRDLPRegistry
 				{
 					currentKeyValueNames.Select(el =>
 							{
-								var selectedKey = Registry.CurrentUser.OpenSubKey(expectedKeyPath);
+                                var selectedKey = keyFatherKeyFullPath.OpenSubKey(expectedKeyPath);
 								return new KeyValuePair<string, object>(el,
 								                                        new KeyValuePair<RegistryValueKind, object>(
 									                                        selectedKey.GetValueKind(el),
@@ -304,7 +304,18 @@ namespace DRDLPRegistry
 			return false;
 		}
 
+		private static void CreateBackUpKeys(RegistryKey expectedFatherRootKey, RegistryKey currentAssociationKey, string expectedFileExtingtionPath, string selectedFileType)
+		{
+			var aggregator = new List<object>();
 
+			GetAllSubKeysAndValuesTree(currentAssociationKey.GetSubKeyNames(), expectedFileExtingtionPath, ref aggregator, Registry.CurrentUser);
+
+			expectedFatherRootKey.DeleteSubKeyTree(expectedFileExtingtionPath, false);
+			expectedFatherRootKey.Flush();
+
+			CreateKeyValuesTree(aggregator, selectedFileType + REGISTRY_BACK_UP_KEY_NAME_TO_ADD, expectedFatherRootKey.OpenSubKey(REGISTRY_FILE_ASSOCIATION_KEY_PATH, true));
+
+		}
 		public static string GetDefaultAssociationProgramPath(string selectedFileType)
 		{
 			if (string.IsNullOrEmpty(selectedFileType))
@@ -320,7 +331,9 @@ namespace DRDLPRegistry
 		{
 			var selectedKeys = Registry.CurrentUser.OpenSubKey(REGISTRY_FILE_ASSOCIATION_KEY_PATH);
 			return selectedKeys != null
-				? selectedKeys.GetSubKeyNames().AsParallel().Where(el => (el.Length > MIN_EXTINGTION_LENGTH) && (el[0] == '.' && (!el.Contains(REGISTRY_BACK_UP_KEY_NAME_TO_ADD))))
+				? Registry.ClassesRoot.GetSubKeyNames().Except(selectedKeys.GetSubKeyNames()).Concat(selectedKeys.GetSubKeyNames())
+												.AsParallel()
+												.Where(el => (el.Length > MIN_EXTINGTION_LENGTH) && (el[0] == '.' && (!el.Contains(REGISTRY_BACK_UP_KEY_NAME_TO_ADD))))
 												.Select(el => new KeyValuePair<string, bool>(el, IsAssociationChanged(el)))
 				: null;
 		}
@@ -334,7 +347,7 @@ namespace DRDLPRegistry
 				throw new ArgumentException("selectedFileType need to be in full format, example: .docx");
 
 			var extingtionNickName = GetCMDCommandCutResult(CMDCommands.ASSOC, selectedFileType);
-			
+
 			if (!string.IsNullOrEmpty(extingtionNickName))
 			{
 				var extingtionIconKey = Registry.ClassesRoot.OpenSubKey(extingtionNickName + Path.DirectorySeparatorChar + REGISTRY_ICON_KEY_NAME);
@@ -362,6 +375,7 @@ namespace DRDLPRegistry
 			}
 		}
 
+
 		public static void ChageFileAssociation(string selectedFileType, string fullPathToTheAssociatedProgram)
 		{
 			if (string.IsNullOrEmpty(selectedFileType))
@@ -376,18 +390,12 @@ namespace DRDLPRegistry
 			var extingtionNickName = GetCMDCommandCutResult(CMDCommands.ASSOC, selectedFileType);
 			var extingtionIconValue = GetDefaultAssociationImage(selectedFileType);
 			var expectedFileExtingtionPath = REGISTRY_FILE_ASSOCIATION_KEY_PATH + Path.DirectorySeparatorChar + selectedFileType;
+
 			var currentAssociationKey = Registry.CurrentUser.OpenSubKey(expectedFileExtingtionPath);
 
 			if (currentAssociationKey != null)
 			{
-				var aggregator = new List<object>();
-
-				GetAllSubKeysAndValuesTree(currentAssociationKey.GetSubKeyNames(), expectedFileExtingtionPath, ref aggregator);
-
-				Registry.CurrentUser.DeleteSubKeyTree(expectedFileExtingtionPath, false);
-				Registry.CurrentUser.Flush();
-
-				CreateKeyValuesTree(aggregator, selectedFileType + REGISTRY_BACK_UP_KEY_NAME_TO_ADD, Registry.CurrentUser.OpenSubKey(REGISTRY_FILE_ASSOCIATION_KEY_PATH, true));
+				CreateBackUpKeys(Registry.CurrentUser, currentAssociationKey, expectedFileExtingtionPath, selectedFileType);
 			}
 
 			var classesRootFatherKey = (selectedFileType + REGISTRY_FILE_ASSOCIATION_AME_TO_ADD).ToUpper().Substring(1);
@@ -396,7 +404,7 @@ namespace DRDLPRegistry
 			Registry.ClassesRoot.OpenSubKey(classesRootFatherKey, true)
 				.SetValue(string.Empty, string.IsNullOrEmpty(extingtionNickName)
 													? string.Empty
-													: Registry.ClassesRoot.OpenSubKey(extingtionNickName).GetValue(string.Empty));
+													: (Registry.ClassesRoot.OpenSubKey(extingtionNickName).GetValue(string.Empty) ?? string.Empty));
 
 			var newClassesRootDefaultImageKey = Registry.ClassesRoot.CreateSubKey(classesRootFatherKey + Path.DirectorySeparatorChar + REGISTRY_ICON_KEY_NAME);
 			newClassesRootDefaultImageKey.SetValue(string.Empty, extingtionIconValue, RegistryValueKind.String);
@@ -445,13 +453,16 @@ namespace DRDLPRegistry
 			if (!IsAssociationChanged(selectedFileType))
 				throw new ArgumentException(string.Format("{0} association isn`t changed by this software", selectedFileType));
 
-			var fullPathToCurrentAssociationKEy = REGISTRY_FILE_ASSOCIATION_KEY_PATH + Path.DirectorySeparatorChar + selectedFileType;
-			var expectedFileExtingtionPath = fullPathToCurrentAssociationKEy + REGISTRY_BACK_UP_KEY_NAME_TO_ADD;
+			var fullPathToCurrentAssociationKey = REGISTRY_FILE_ASSOCIATION_KEY_PATH + Path.DirectorySeparatorChar + selectedFileType;
+			var expectedFileExtingtionPath = fullPathToCurrentAssociationKey + REGISTRY_BACK_UP_KEY_NAME_TO_ADD;
 
 			var currentAssociationKey = Registry.CurrentUser.OpenSubKey(expectedFileExtingtionPath);
 
 			if (currentAssociationKey == null)
-				throw new Exception("Back up key is missing");
+			{
+				Registry.CurrentUser.DeleteSubKeyTree(fullPathToCurrentAssociationKey, false);
+				Registry.CurrentUser.Close();
+			}
 
 			var associationPseudonim = (selectedFileType + REGISTRY_FILE_ASSOCIATION_AME_TO_ADD).ToUpper().Substring(1);
 
@@ -459,11 +470,11 @@ namespace DRDLPRegistry
 
 			var aggregator = new List<object>();
 
-			GetAllSubKeysAndValuesTree(currentAssociationKey.GetSubKeyNames(), expectedFileExtingtionPath, ref aggregator);
+			GetAllSubKeysAndValuesTree(currentAssociationKey.GetSubKeyNames(), expectedFileExtingtionPath, ref aggregator, Registry.CurrentUser);
 
-			var openWithList = Registry.CurrentUser.OpenSubKey(fullPathToCurrentAssociationKEy + Path.DirectorySeparatorChar + REGISTRY_USER_EXTINGTION_OPEN_WITH_PROG_IDS_KEY_NAME, true);
+			var openWithList = Registry.CurrentUser.OpenSubKey(fullPathToCurrentAssociationKey + Path.DirectorySeparatorChar + REGISTRY_USER_EXTINGTION_OPEN_WITH_PROG_IDS_KEY_NAME, true);
 
-			if (openWithList != null) 
+			if (openWithList != null)
 				openWithList.DeleteValue(associationPseudonim);
 
 			Registry.CurrentUser.DeleteSubKeyTree(expectedFileExtingtionPath, false);
