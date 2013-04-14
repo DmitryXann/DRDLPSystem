@@ -89,7 +89,7 @@ namespace DRDLPFileTransformation
 
 			NOTIFY_ICON.ShowBalloonTip(BALOON_TIME_OUT);
 
-			var disposeNotificationIcon = new System.Threading.Timer(el => NOTIFY_ICON.Dispose(), null, TIMER_TIME_OUT, Timeout.Infinite);
+			new System.Threading.Timer(el => NOTIFY_ICON.Dispose(), null, TIMER_TIME_OUT, Timeout.Infinite);
 
 			var fileTransformation = new FileTransformation(selctedFile);
 
