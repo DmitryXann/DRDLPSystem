@@ -128,13 +128,14 @@ namespace DRDLPNet4_5.FileTranfsormation
 				throw new ArgumentException(string.Format("File already exists {0}", fullPathToNewFile));
 
 			var fileContainer = new FileContainer();
+			var encryptedFile = fileContainer.GetSafeFile(fileToEncrypt);
 
 			if (File.Exists(fullPathToNewFile))
 				File.Delete(fullPathToNewFile);
 
 			using (var zipFile = ZipFile.Open(fullPathToNewFile, ZipArchiveMode.Create))
 			{
-				foreach (var file in fileContainer.GetSafeFile(fileToEncrypt))
+				foreach (var file in encryptedFile)
 				{
 					using (var zipEntrySteam = new StreamWriter(zipFile.CreateEntry(file.Key).Open()))
 					{

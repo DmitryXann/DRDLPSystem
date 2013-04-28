@@ -22,8 +22,8 @@ namespace DRDLPNet4_5.FileTranfsormation
 		private const sbyte ONE_HEX_MAX_ELEMENT_COUNT = 4;
 		private const sbyte NUMERIC_BASE = 16;
 
-		private const byte AES_BLOCK_SIZE = 128;
-		private const byte AES_TAKE_KEY_ELEMENT_NUMBER = 32;
+		
+		private const byte AES_TAKE_KEY_ELEMENT_NUMBER = 24;
 		private const byte AES_TAKE_IV_ELEMENT_NUMBER = 16;
 
 		private const sbyte FILE_SIZE_TAKE_ELEMENTS_FROM_HASH = 3;
@@ -175,7 +175,8 @@ namespace DRDLPNet4_5.FileTranfsormation
 		private void StartFileCreation(object inputData)
 		{
 			var data = (KeyValuePair<string, string>)inputData;
-			_preperadFiles.Add(new KeyValuePair<string, string>(data.Key, ByteArrayToHexString(DataCryptography.GetAESEncryptedMessage(data.Value, _aesKeyValue, _aesIvValue, AES_BLOCK_SIZE))));
+			_preperadFiles.Add(new KeyValuePair<string, string>(data.Key, ByteArrayToHexString(DataCryptography.GetAESEncryptedMessage(data.Value, _aesKeyValue, 
+																										_aesIvValue, DataCryptography.AES_BLOCK_SIZE, DataCryptography.AesKeySize.Aes192))));
 			_startedCretionThreads--;
 		}
 
@@ -183,7 +184,9 @@ namespace DRDLPNet4_5.FileTranfsormation
 		{
 			var data = (KeyValuePair<int, string>) inputData;
 			_sourceDecryptedFileData.Add(new KeyValuePair<int, List<byte>>(data.Key,
-				HexStringToByteList(DataCryptography.GetAESDecryptedMessage(HexStringToByteList(data.Value).ToArray(), _aesKeyValue, _aesIvValue, AES_BLOCK_SIZE).Trim(DataCryptography.CHARS_TO_TRIM))));
+				HexStringToByteList(DataCryptography.GetAESDecryptedMessage(HexStringToByteList(data.Value).ToArray(), 
+																			_aesKeyValue, _aesIvValue, DataCryptography.AES_BLOCK_SIZE, DataCryptography.AesKeySize.Aes192)
+																			.Trim(DataCryptography.CHARS_TO_TRIM))));
 			_startedReCretionThreads--;
 		}
 		#endregion
@@ -256,7 +259,9 @@ namespace DRDLPNet4_5.FileTranfsormation
 					for (var subCount = counter; subCount < counter + _filesSizeInfoes; subCount++)
 						accumulator.Append(inputFileBits[subCount]);
 
-					_preperadFiles.Add(new KeyValuePair<string, string>((totalCounter++).ToString(), ByteArrayToHexString(DataCryptography.GetAESEncryptedMessage(accumulator.ToString(), _aesKeyValue, _aesIvValue, AES_BLOCK_SIZE))));
+					_preperadFiles.Add(new KeyValuePair<string, string>((totalCounter++).ToString(), 
+										ByteArrayToHexString(DataCryptography.GetAESEncryptedMessage(accumulator.ToString(), 
+											_aesKeyValue, _aesIvValue, DataCryptography.AES_BLOCK_SIZE, DataCryptography.AesKeySize.Aes192))));
 					accumulator.Clear();
 				}
 				 
@@ -266,7 +271,9 @@ namespace DRDLPNet4_5.FileTranfsormation
 			{
 				for (var subCount = counter; subCount < inputFileBitsCount; subCount++)
 					accumulator.Append(inputFileBits[subCount]);
-				_preperadFiles.Add(new KeyValuePair<string, string>(totalCounter.ToString(), ByteArrayToHexString(DataCryptography.GetAESEncryptedMessage(accumulator.ToString(), _aesKeyValue, _aesIvValue, AES_BLOCK_SIZE))));
+				_preperadFiles.Add(new KeyValuePair<string, string>(totalCounter.ToString(), 
+									ByteArrayToHexString(DataCryptography.GetAESEncryptedMessage(accumulator.ToString(), 
+														_aesKeyValue, _aesIvValue, DataCryptography.AES_BLOCK_SIZE, DataCryptography.AesKeySize.Aes192))));
 			}
 
 			_preperadFiles.Add(new KeyValuePair<string, string>(FILE_TRANSFORMED_FLAG, string.Empty));
@@ -311,7 +318,9 @@ namespace DRDLPNet4_5.FileTranfsormation
 			}
 
 			_sourceDecryptedFileData.Add(new KeyValuePair<int, List<byte>>(index,
-				HexStringToByteList(DataCryptography.GetAESDecryptedMessage(HexStringToByteList(accumulator[index]).ToArray(), _aesKeyValue, _aesIvValue, AES_BLOCK_SIZE).Trim(DataCryptography.CHARS_TO_TRIM))));
+				HexStringToByteList(DataCryptography.GetAESDecryptedMessage(HexStringToByteList(accumulator[index]).ToArray(), 
+																			_aesKeyValue, _aesIvValue, DataCryptography.AES_BLOCK_SIZE, DataCryptography.AesKeySize.Aes192)
+																			.Trim(DataCryptography.CHARS_TO_TRIM))));
 			
 			while (_startedReCretionThreads > 0)
 				Thread.Sleep(1);

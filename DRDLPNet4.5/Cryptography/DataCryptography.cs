@@ -8,6 +8,15 @@ namespace DRDLPNet4_5.Cryptography
 {
 	public static class DataCryptography
 	{
+		public const byte AES_BLOCK_SIZE = 128;
+
+		public enum AesKeySize
+		{
+			Aes128 = 128,
+			Aes192 = 192,
+			Aes256 = 256
+		}
+
 		public enum HashSum
 		{
 			Md5,
@@ -63,7 +72,7 @@ namespace DRDLPNet4_5.Cryptography
 
 		}
 
-		public static byte[] GetAESEncryptedMessage(string message, byte[] key, byte[] iv, int blockSize)
+		public static byte[] GetAESEncryptedMessage(string message, byte[] key, byte[] iv, int blockSize, AesKeySize keySize)
 		{
 			if (string.IsNullOrEmpty(message))
 				return null;
@@ -76,6 +85,7 @@ namespace DRDLPNet4_5.Cryptography
 
 			using (var aes = new AesManaged())
 			{
+				aes.KeySize = (int)keySize;
 				aes.BlockSize = blockSize;
 				aes.Key = key;
 				aes.IV = iv;
@@ -96,7 +106,7 @@ namespace DRDLPNet4_5.Cryptography
 			}
 		}
 
-		public static string GetAESDecryptedMessage(byte[] message, byte[] key, byte[] iv, int blockSize)
+		public static string GetAESDecryptedMessage(byte[] message, byte[] key, byte[] iv, int blockSize, AesKeySize keySize)
 		{
 			if ((message == null) || (message.Length <= 0))
 				return string.Empty;
@@ -109,6 +119,8 @@ namespace DRDLPNet4_5.Cryptography
 
 			using (var aes = new AesManaged())
 			{
+				aes.KeySize = (int)keySize;
+				aes.KeySize = 
 				aes.BlockSize = blockSize;
 				aes.Key = key;
 				aes.IV = iv;
