@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="4e17ea0b6c6b4492a5b22bb25e4783be" Name="Diagram1" >
+        <EntityTypeShape EntityType="DRDLPModel.Administrator" Width="1.5" PointX="10.375" PointY="2.125" />
+        <EntityTypeShape EntityType="DRDLPModel.Hardware" Width="1.5" PointX="3.375" PointY="0.5" />
+        <EntityTypeShape EntityType="DRDLPModel.PC" Width="1.5" PointX="1.125" PointY="1.5" />
+        <EntityTypeShape EntityType="DRDLPModel.User" Width="1.5" PointX="3" PointY="6.5" />
+        <EntityTypeShape EntityType="DRDLPModel.Document" Width="1.5" PointX="5.5" PointY="2.625" />
+        <AssociationConnector Association="DRDLPModel.PCHardware" />
+        <AssociationConnector Association="DRDLPModel.PCUser" />
+        <AssociationConnector Association="DRDLPModel.PCDocuments" ></AssociationConnector>
+        <EntityTypeShape EntityType="DRDLPModel.UserAccess" Width="1.5" PointX="6.625" PointY="7.5" />
+        <AssociationConnector Association="DRDLPModel.DocumentsUserAccess" />
+        <AssociationConnector Association="DRDLPModel.UserUserAccess" />
+        <AssociationConnector Association="DRDLPModel.DocumentsUser" />
+        <AssociationConnector Association="DRDLPModel.DocumentsUser1" />
+        <EntityTypeShape EntityType="DRDLPModel.DocumentPath" Width="1.5" PointX="8" PointY="2.125" />
+        <AssociationConnector Association="DRDLPModel.DocumentPathPC" />
+        <AssociationConnector Association="DRDLPModel.DocumentDocumentPath" />
+        <EntityTypeShape EntityType="DRDLPModel.AccessLog" Width="1.5" PointX="8.75" PointY="5.375" />
+        <AssociationConnector Association="DRDLPModel.DocumentAccessLog" />
+        <AssociationConnector Association="DRDLPModel.UserAccessLog" />
+        <AssociationConnector Association="DRDLPModel.AccessLogPC" />
+        <AssociationConnector Association="DRDLPModel.DocumentPathAccessLog" />
+        <AssociationConnector Association="DRDLPModel.UserAccessAccessLog" />
+        <AssociationConnector Association="DRDLPModel.HardwareAccessLog" ManuallyRouted="false" >
+        </AssociationConnector>
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
