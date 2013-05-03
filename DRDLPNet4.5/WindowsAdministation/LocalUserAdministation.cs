@@ -2,7 +2,6 @@
 using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
-using DRDLPNet4_5.Cryptography;
 
 namespace DRDLPNet4_5.WindowsAdministation
 {
@@ -15,8 +14,8 @@ namespace DRDLPNet4_5.WindowsAdministation
 		private const string DRDLP_SYSTEM_USER_DESCRIPTION = "This is DRDLPSystem user, witch is needed for security reasons";
 
 		private static readonly string USER_USER_GROUP_PATH = string.Format("WinNT://{0},computer", Environment.MachineName);
-		private static readonly string USER_PASSWORD = DataCryptography.GetHashSum(DataSource.SystemInformation.GetCPUSerialInfo.FirstOrDefault() +
-																				   DataSource.SystemInformation.GetCPUName.FirstOrDefault() +
+		private static readonly string USER_PASSWORD = DataCryptography.GetHashSum(SystemInformation.GetCPUSerialInfo.FirstOrDefault() +
+																				   SystemInformation.GetCPUName.FirstOrDefault() +
 																				   DRDLP_SYSTEM_USER_NAME, DataCryptography.HashSum.Md5);
 		private enum ClassName
 		{

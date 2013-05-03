@@ -1,17 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
+using System.Linq;
 
 namespace DRDLPNet4_5.NamedPipes
 {
-	public class NamedPipeClient
+	public class NamedPipeClientClipboardHandler : IDisposable
 	{
 		private const string SERVER_NAME = ".";
-		
-		//public delegate void FileReadySignature(string fileName, NamedPipesSharedData.NameedPipesServerAction selectedAction);
-		//public event FileReadySignature FileReady;
+		private readonly NamedPipeClientStream _namedPipeClientStream;
+		private readonly StreamWriter _streamWriter;
+		//private readonly StreamReader _streamReader;
 
-		public static string GetPerconalConversationPipeName()
+		public NamedPipeClientClipboardHandler()
 		{
 			using (var namingPipeClient = new NamedPipeClientStream(SERVER_NAME, NamedPipesSharedData.LisenerServerPipeName))
 			{
@@ -22,45 +25,48 @@ namespace DRDLPNet4_5.NamedPipes
 				pipeWriter.WriteLine(NamedPipesSharedData.LisenerServerPipeName);
 				pipeWriter.Flush();
 				namingPipeClient.WaitForPipeDrain();
-				
+
 				var readedName = pipeReader.ReadLine();
-				
-				return readedName;
+
+				if (string.IsNullOrEmpty(readedName))
+					return;
+
+				_namedPipeClientStream = new NamedPipeClientStream(SERVER_NAME, readedName, PipeDirection.InOut);
+				_streamWriter = new StreamWriter(_namedPipeClientStream);
+				_namedPipeClientStream.Connect();
+				//_streamReader = new StreamReader(_namedPipeClientStream);
 			}
 		}
 
-		public void StartConversation(string personalPipeName, string fileName,  NamedPipesSharedData.NameedPipesServerAction selectedAction)
+		private void SendInfoToServer(int pid, NamedPipesSharedData.NameedPipesServerAction action)
 		{
-			if (string.IsNullOrEmpty(personalPipeName))
-				throw new ArgumentException("personalPipeName can`t be empty or null");
+			_streamWriter.WriteLine(pid);
+			_streamWriter.WriteLine(action);
+			_streamWriter.Flush();
+			_namedPipeClientStream.WaitForPipeDrain();
+		}
+		public bool AddPIDToWatchList(int pid)
+		{
+			if (!Process.GetProcesses().Any(el => el.Id == pid))
+				return false;
 
-			if (string.IsNullOrEmpty(fileName))
-				throw new ArgumentException("fileName can`t be empty or null");
+			SendInfoToServer(pid, NamedPipesSharedData.NameedPipesServerAction.AddPID);
+			return true;
+		}
 
-			using (var namingPipeClient = new NamedPipeClientStream(SERVER_NAME, personalPipeName, PipeDirection.InOut))
-			{
-				namingPipeClient.Connect();
-				var pipeWriter = new StreamWriter(namingPipeClient);
-				var pipeReader = new StreamReader(namingPipeClient);
+		public bool RemovePIDFromWathList(int pid)
+		{
+			if (!Process.GetProcesses().Any(el => el.Id == pid))
+				return false;
 
-				var readedData = pipeReader.ReadLine();
+			SendInfoToServer(pid, NamedPipesSharedData.NameedPipesServerAction.RemovePID);
+			return true;
+		}
 
-				if (string.IsNullOrEmpty(readedData) || !readedData.Equals(personalPipeName))
-					return;
-
-				pipeWriter.WriteLine(fileName);
-				pipeWriter.Flush();
-				namingPipeClient.WaitForPipeDrain();
-
-				pipeWriter.WriteLine(selectedAction.ToString());
-				pipeWriter.Flush();
-				namingPipeClient.WaitForPipeDrain();
-
-				/*var fileIsReady = pipeReader.ReadLine();
-				if ((FileReady != null) && !string.IsNullOrEmpty(fileIsReady))
-					FileReady(fileIsReady, selectedAction);
-				 */
-			}
+		public void Dispose()
+		{
+			if (_namedPipeClientStream != null)
+				_namedPipeClientStream.Dispose();
 		}
 	}
 }

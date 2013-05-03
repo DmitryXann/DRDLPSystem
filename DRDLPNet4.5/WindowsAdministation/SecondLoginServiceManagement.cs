@@ -11,9 +11,9 @@ namespace DRDLPNet4_5.WindowsAdministation
 
 		[DllImport("advapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
 		private static extern Boolean ChangeServiceConfig(IntPtr hService,
-														 UInt32 nServiceType,
-														 UInt32 nStartType,
-														 UInt32 nErrorControl,
+														 uint nServiceType,
+														 uint nStartType,
+														 uint nErrorControl,
 														 String lpBinaryPathName,
 														 String lpLoadOrderGroup,
 														 IntPtr lpdwTagId,
@@ -23,15 +23,19 @@ namespace DRDLPNet4_5.WindowsAdministation
 														 String lpDisplayName);
 
 		[DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-		private static extern IntPtr OpenService(IntPtr hSCManager, string lpServiceName, uint dwDesiredAccess);
+		private static extern IntPtr OpenService(IntPtr hSCManager, string lpServiceName, WinServiceFlags dwDesiredAccess);
 
 		[DllImport("advapi32.dll", EntryPoint = "OpenSCManagerW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
 		private static extern IntPtr OpenSCManager(string machineName, string databaseName, uint dwAccess);
 
-		private const uint SERVICE_NO_CHANGE = 0xFFFFFFFF;
-		private const uint SERVICE_QUERY_CONFIG = 0x00000001;
-		private const uint SERVICE_CHANGE_CONFIG = 0x00000002;
-		private const uint SC_MANAGER_ALL_ACCESS = 0x000F003F;
+		[Flags]
+		private enum WinServiceFlags : uint
+		{
+			SERVICE_NO_CHANGE	  = 0xFFFFFFFF,
+			SERVICE_QUERY_CONFIG  = 0x00000001,
+			SERVICE_CHANGE_CONFIG = 0x00000002,
+			SC_MANAGER_ALL_ACCESS = 0x000F003F,
+		}
 
 		public static bool IsSecondLoginServiceRunning { get { return ServiceStatus(SECOND_LOGIN_SERVICE_NAME) == ServiceControllerStatus.Running; } }
 
@@ -44,7 +48,7 @@ namespace DRDLPNet4_5.WindowsAdministation
 		}
 		private static void ChangeServiceStartMode(ServiceController serviceController, ServiceStartMode selectedMode)
 		{
-			var serviceControllerManagerHandle = OpenSCManager(null, null, SC_MANAGER_ALL_ACCESS);
+			var serviceControllerManagerHandle = OpenSCManager(null, null, (uint)WinServiceFlags.SC_MANAGER_ALL_ACCESS);
 
 			if (serviceControllerManagerHandle == IntPtr.Zero)
 				throw new ExternalException("Open Service Manager Error");
@@ -52,15 +56,15 @@ namespace DRDLPNet4_5.WindowsAdministation
 			var serviceHandle = OpenService(
 				serviceControllerManagerHandle,
 				serviceController.ServiceName,
-				SERVICE_QUERY_CONFIG | SERVICE_CHANGE_CONFIG);
+				WinServiceFlags.SERVICE_QUERY_CONFIG | WinServiceFlags.SERVICE_CHANGE_CONFIG);
 
 			if (serviceHandle == IntPtr.Zero)
 				throw new ExternalException("Open Service Error");
 
 			var result = ChangeServiceConfig(serviceHandle,
-											 SERVICE_NO_CHANGE,
+											 (uint)WinServiceFlags.SERVICE_NO_CHANGE,
 											 (uint)selectedMode,
-											 SERVICE_NO_CHANGE,
+											 (uint)WinServiceFlags.SERVICE_NO_CHANGE,
 											 null,
 											 null,
 											 IntPtr.Zero,

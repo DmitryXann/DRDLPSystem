@@ -34,10 +34,12 @@
     <Reference Include="System.Core" />
     <Reference Include="System.DirectoryServices" />
     <Reference Include="System.DirectoryServices.AccountManagement" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Management" />
     <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -45,10 +47,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cryptography\DataCryptography.cs" />
-    <Compile Include="DataSource\SystemInformation.cs" />
+    <Compile Include="Helpres\ClientGUIHelpers\ClientGUIMainAbstractClass.cs" />
+    <Compile Include="Helpres\ClientGUIHelpers\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="DataCryptography.cs" />
+    <Compile Include="SystemInformation.cs" />
     <Compile Include="FileTranfsormation\FileContainer.cs" />
     <Compile Include="FileTranfsormation\FileTransformation.cs" />
+    <Compile Include="Helpres\StructExtingtion.cs" />
     <Compile Include="NamedPipes\NamedPipeClient.cs" />
     <Compile Include="NamedPipes\NamedPipeServer.cs" />
     <Compile Include="NamedPipes\NamedPipesSharedData.cs" />
@@ -62,6 +71,17 @@
       <Name>DRDLPRegistry</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Helpres\ClientGUIHelpers\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Helpres\ClientGUIHelpers\Resources\appIco.ico" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

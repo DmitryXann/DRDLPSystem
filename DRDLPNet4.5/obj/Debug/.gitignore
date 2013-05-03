@@ -6,3 +6,5 @@
 /DRDLPNet4_5.dll
 /DRDLPNet4_5.pdb
 /*.csprojResolveAssemblyReference.cache
+/DRDLPNet4_5.Helpres.ClientGUIHelpers.Resources.resources
+/DRDLPNet4_5.csproj.GenerateResource.Cache

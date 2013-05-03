@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Management;
 
-namespace DRDLPNet4_5.DataSource
+namespace DRDLPNet4_5
 {
 	public static class SystemInformation
 	{

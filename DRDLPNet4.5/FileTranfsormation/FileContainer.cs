@@ -7,8 +7,6 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using DRDLPNet4_5.Cryptography;
-using DRDLPNet4_5.DataSource;
 
 namespace DRDLPNet4_5.FileTranfsormation
 {
@@ -17,19 +15,19 @@ namespace DRDLPNet4_5.FileTranfsormation
 	/// TODO: no custom constructor for custom hardware
 	/// TODO: no file naming randomization, consider implementation???? 
 	/// </summary>
-	public class FileContainer
+	public abstract class FileContainer
 	{
-		private const sbyte ONE_HEX_MAX_ELEMENT_COUNT = 4;
-		private const sbyte NUMERIC_BASE = 16;
+		protected const sbyte ONE_HEX_MAX_ELEMENT_COUNT = 4;
+		protected const sbyte NUMERIC_BASE = 16;
 
-		
-		private const byte AES_TAKE_KEY_ELEMENT_NUMBER = 24;
-		private const byte AES_TAKE_IV_ELEMENT_NUMBER = 16;
 
-		private const sbyte FILE_SIZE_TAKE_ELEMENTS_FROM_HASH = 3;
+		protected const byte AES_TAKE_KEY_ELEMENT_NUMBER = 24;
+		protected const byte AES_TAKE_IV_ELEMENT_NUMBER = 16;
+
+		protected const sbyte FILE_SIZE_TAKE_ELEMENTS_FROM_HASH = 3;
 
 		#region HARDWARE info
-		private static string CpuSerial
+		protected virtual string CpuSerial
 		{
 			get
 			{
@@ -49,7 +47,8 @@ namespace DRDLPNet4_5.FileTranfsormation
 				}
 			}
 		}
-		private static string CPUName
+
+		protected virtual string CPUName
 		{
 			get
 			{
@@ -70,7 +69,7 @@ namespace DRDLPNet4_5.FileTranfsormation
 			}
 		}
 
-		private static string MBSerial
+		protected virtual string MBSerial
 		{
 			get
 			{
@@ -89,7 +88,8 @@ namespace DRDLPNet4_5.FileTranfsormation
 				}
 			}
 		}
-		private static string MBName
+
+		protected virtual string MBName
 		{
 			get
 			{
@@ -110,7 +110,7 @@ namespace DRDLPNet4_5.FileTranfsormation
 			}
 		}
 
-		private static string VGAID
+		protected virtual string VGAID
 		{
 			get
 			{
@@ -131,7 +131,7 @@ namespace DRDLPNet4_5.FileTranfsormation
 			}
 		}
 
-		private static string USBID
+		protected virtual string USBID
 		{
 			get
 			{
@@ -164,7 +164,7 @@ namespace DRDLPNet4_5.FileTranfsormation
 
 		public const string FILE_TRANSFORMED_FLAG = "DocumentRelatedDLPSystemFile"; //needs refactoring 
 
-		public FileContainer()
+		protected FileContainer()
 		{
 			_filesSizeInfoes = int.Parse(DataCryptography.GetHashSum(CpuSerial + MBName, DataCryptography.HashSum.Md5).Substring(0, FILE_SIZE_TAKE_ELEMENTS_FROM_HASH), NumberStyles.HexNumber);
 			_aesKeyValue = Encoding.ASCII.GetBytes(DataCryptography.GetHashSum(CpuSerial + MBSerial + USBID, DataCryptography.HashSum.Sha512)).Take(AES_TAKE_KEY_ELEMENT_NUMBER).ToArray();
@@ -172,7 +172,7 @@ namespace DRDLPNet4_5.FileTranfsormation
 		}
 
 		#region Threads
-		private void StartFileCreation(object inputData)
+		protected virtual void StartFileCreation(object inputData)
 		{
 			var data = (KeyValuePair<string, string>)inputData;
 			_preperadFiles.Add(new KeyValuePair<string, string>(data.Key, ByteArrayToHexString(DataCryptography.GetAESEncryptedMessage(data.Value, _aesKeyValue, 
@@ -180,7 +180,7 @@ namespace DRDLPNet4_5.FileTranfsormation
 			_startedCretionThreads--;
 		}
 
-		private void StartFileReCreation(object inputData)
+		protected virtual void StartFileReCreation(object inputData)
 		{
 			var data = (KeyValuePair<int, string>) inputData;
 			_sourceDecryptedFileData.Add(new KeyValuePair<int, List<byte>>(data.Key,
@@ -192,7 +192,7 @@ namespace DRDLPNet4_5.FileTranfsormation
 		#endregion
 
 		//TODO: test for string vs StrungBuilder
-		private static List<byte> HexStringToByteList(string selectedData)
+		protected virtual List<byte> HexStringToByteList(string selectedData)
 		{
 			if (string.IsNullOrEmpty(selectedData))
 				return null;
@@ -214,7 +214,7 @@ namespace DRDLPNet4_5.FileTranfsormation
 			return sourceDecryptedFileData;
 		}
 		//TODO: test for string vs StrungBuilder
-		private static string ByteArrayToHexString(IEnumerable<byte> sourceData)
+		protected virtual string ByteArrayToHexString(IEnumerable<byte> sourceData)
 		{
 			//var outputData = new StringBuilder();
 			var outputData = string.Empty;
@@ -228,7 +228,7 @@ namespace DRDLPNet4_5.FileTranfsormation
 			return outputData/*.ToString()*/;
 		}
 
-		public IEnumerable<KeyValuePair<string, string>> GetSafeFile(string fileName)
+		public virtual IEnumerable<KeyValuePair<string, string>> GetSafeFile(string fileName)
 		{
 			if (!File.Exists(fileName))
 				throw new FileNotFoundException(string.Format("File not found {0}", fileName));
@@ -279,12 +279,12 @@ namespace DRDLPNet4_5.FileTranfsormation
 			_preperadFiles.Add(new KeyValuePair<string, string>(FILE_TRANSFORMED_FLAG, string.Empty));
 
 			while (_startedCretionThreads > 0)
-				Thread.Sleep(1);
+				Thread.Sleep(10);
 
 			return _preperadFiles;
 		}
-		
-		public IEnumerable<byte> GetSourceFileBytes(string fileName)
+
+		public virtual IEnumerable<byte> GetSourceFileBytes(string fileName)
 		{
 			if (!File.Exists(fileName))
 				throw new FileNotFoundException(string.Format("File not found {0}", fileName));
@@ -323,7 +323,7 @@ namespace DRDLPNet4_5.FileTranfsormation
 																			.Trim(DataCryptography.CHARS_TO_TRIM))));
 			
 			while (_startedReCretionThreads > 0)
-				Thread.Sleep(1);
+				Thread.Sleep(10);
 
 			var fileBytes = new List<byte>();
 
