@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.ServiceProcess;
 
-namespace DRDLPNet4_5.WindowsAdministation
+namespace DRDLPCore.WindowsAdministation
 {
 	public static class SecondLoginServiceManagement
 	{

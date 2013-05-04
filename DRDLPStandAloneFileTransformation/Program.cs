@@ -2,7 +2,7 @@
 using System.Linq;
 using System.IO;
 
-namespace DRDLPFileTransformation
+namespace DRDLPStandAloneFileTransformation
 {
 	static class Program
 	{

@@ -63,9 +63,9 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DRDLPNet4.5\DRDLPNet4_5.csproj">
+    <ProjectReference Include="..\DRDLPNet4.5\DRDLPCore.csproj">
       <Project>{8cac77c3-ac5c-4d8d-b018-61d554635257}</Project>
-      <Name>DRDLPNet4_5</Name>
+      <Name>DRDLPCore</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -1,7 +1,7 @@
 ﻿using System.IO;
-using DRDLPNet4_5.Helpres.ClientGUIHelpers;
+using DRDLPCore.Helpres.ClientGUIHelpers;
 
-namespace DRDLPFileTransformation
+namespace DRDLPStandAloneFileTransformation
 {
 	internal class StandAloneClientGUI : ClientGUIMainAbstractClass
 	{

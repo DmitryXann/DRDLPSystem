@@ -4,7 +4,7 @@ using System.IO;
 using System.IO.Pipes;
 using System.Threading;
 
-namespace DRDLPNet4_5.NamedPipes
+namespace DRDLPCore.NamedPipes
 {
 	public abstract class NamedPipeServer
 	{

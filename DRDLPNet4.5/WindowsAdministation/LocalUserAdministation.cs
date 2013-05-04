@@ -3,7 +3,7 @@ using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
 
-namespace DRDLPNet4_5.WindowsAdministation
+namespace DRDLPCore.WindowsAdministation
 {
 	static class LocalUserAdministation
 	{

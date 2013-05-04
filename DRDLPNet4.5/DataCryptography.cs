@@ -4,7 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace DRDLPNet4_5
+namespace DRDLPCore
 {
 	public static class DataCryptography
 	{

@@ -7,11 +7,11 @@ using System.IO.Compression;
 using System.Linq;
 using System.Security;
 using System.Security.AccessControl;
-using DRDLPNet4_5.WindowsAdministation;
+using DRDLPCore.WindowsAdministation;
 using DRDLPRegistry;
-using DRDLPNet4_5.Helpres;
+using DRDLPCore.Helpres;
 
-namespace DRDLPNet4_5.FileTranfsormation
+namespace DRDLPCore.FileTranfsormation
 {
 	public class FileTransformation : FileContainer
 	{

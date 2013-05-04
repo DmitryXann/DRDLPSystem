@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace DRDLPNet4_5.NamedPipes
+namespace DRDLPCore.NamedPipes
 {
 	public static class NamedPipesSharedData
 	{

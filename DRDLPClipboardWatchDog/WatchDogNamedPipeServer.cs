@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.IO.Pipes;
 using System.Threading;
-using DRDLPNet4_5.NamedPipes;
+using DRDLPCore.NamedPipes;
 
 namespace DRDLPClipboardWatchDog
 {

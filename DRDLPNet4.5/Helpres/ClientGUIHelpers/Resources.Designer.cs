@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace DRDLPNet4_5.Helpres.ClientGUIHelpers {
+namespace DRDLPCore.Helpres.ClientGUIHelpers {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace DRDLPNet4_5.Helpres.ClientGUIHelpers {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DRDLPNet4_5.Helpres.ClientGUIHelpers.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DRDLPCore.Helpres.ClientGUIHelpers.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

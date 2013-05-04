@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace DRDLPNet4_5.FileTranfsormation
+namespace DRDLPCore.FileTranfsormation
 {
 	/// <summary>
 	/// TODO: no exception handling

@@ -4,10 +4,10 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
-using DRDLPNet4_5.FileTranfsormation;
+using DRDLPCore.FileTranfsormation;
 using DRDLPRegistry;
 
-namespace DRDLPNet4_5.Helpres.ClientGUIHelpers
+namespace DRDLPCore.Helpres.ClientGUIHelpers
 {
 	public abstract class ClientGUIMainAbstractClass
 	{

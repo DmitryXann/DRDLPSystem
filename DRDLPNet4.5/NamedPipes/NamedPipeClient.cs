@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
 
-namespace DRDLPNet4_5.NamedPipes
+namespace DRDLPCore.NamedPipes
 {
 	public class NamedPipeClientClipboardHandler : IDisposable
 	{

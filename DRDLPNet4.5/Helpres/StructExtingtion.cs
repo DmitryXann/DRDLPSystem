@@ -1,4 +1,4 @@
-﻿namespace DRDLPNet4_5.Helpres
+﻿namespace DRDLPCore.Helpres
 {
 	public static class StructExtingtion
 	{

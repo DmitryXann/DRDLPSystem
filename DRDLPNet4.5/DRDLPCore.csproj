@@ -7,8 +7,8 @@
     <ProjectGuid>{8CAC77C3-AC5C-4D8D-B018-61D554635257}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DRDLPNet4_5</RootNamespace>
-    <AssemblyName>DRDLPNet4_5</AssemblyName>
+    <RootNamespace>DRDLPCore</RootNamespace>
+    <AssemblyName>DRDLPCore</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
