@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TEST_CONSOLE", "TEST_CONSOL
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRDLPNet4_5", "DRDLPNet4.5\DRDLPNet4_5.csproj", "{8CAC77C3-AC5C-4D8D-B018-61D554635257}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRDLPAssociationEdit", "DLPAssociationEdit\DRDLPAssociationEdit.csproj", "{A1011BC3-4293-4346-A699-E88C27157ADC}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRDLPRegistry", "DRDLPRegistry\DRDLPRegistry.csproj", "{4C2A3903-895F-4B5E-B5C9-1DF088DBA7DA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRDLPSystemDAL", "DRDLPSystemDAL\DRDLPSystemDAL.csproj", "{47D22AF7-FCD5-46A7-A995-2C246E775353}"
@@ -16,6 +14,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRDLPWindowsService", "DRDLPWindowsService\DRDLPWindowsService.csproj", "{61FF12F8-961F-4D7C-BDD0-96D275C91981}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRDLPStandAloneFileTransformation", "DRDLPStandAloneFileTransformation\DRDLPStandAloneFileTransformation.csproj", "{857AD7A7-57B0-49C2-9E16-B168F05DB493}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRDLPClipboardWatchDog", "DRDLPClipboardWatchDog\DRDLPClipboardWatchDog.csproj", "{E7E5A0C1-E5CF-4B16-8F52-2C89E613332D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRDLPAssociationEdit", "DRDLPAssociationEdit\DRDLPAssociationEdit.csproj", "{A1011BC3-4293-4346-A699-E88C27157ADC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +37,6 @@ Global
 		{8CAC77C3-AC5C-4D8D-B018-61D554635257}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8CAC77C3-AC5C-4D8D-B018-61D554635257}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8CAC77C3-AC5C-4D8D-B018-61D554635257}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A1011BC3-4293-4346-A699-E88C27157ADC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A1011BC3-4293-4346-A699-E88C27157ADC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A1011BC3-4293-4346-A699-E88C27157ADC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A1011BC3-4293-4346-A699-E88C27157ADC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4C2A3903-895F-4B5E-B5C9-1DF088DBA7DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4C2A3903-895F-4B5E-B5C9-1DF088DBA7DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C2A3903-895F-4B5E-B5C9-1DF088DBA7DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -55,6 +53,14 @@ Global
 		{857AD7A7-57B0-49C2-9E16-B168F05DB493}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{857AD7A7-57B0-49C2-9E16-B168F05DB493}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{857AD7A7-57B0-49C2-9E16-B168F05DB493}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7E5A0C1-E5CF-4B16-8F52-2C89E613332D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7E5A0C1-E5CF-4B16-8F52-2C89E613332D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7E5A0C1-E5CF-4B16-8F52-2C89E613332D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7E5A0C1-E5CF-4B16-8F52-2C89E613332D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1011BC3-4293-4346-A699-E88C27157ADC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1011BC3-4293-4346-A699-E88C27157ADC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1011BC3-4293-4346-A699-E88C27157ADC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1011BC3-4293-4346-A699-E88C27157ADC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
