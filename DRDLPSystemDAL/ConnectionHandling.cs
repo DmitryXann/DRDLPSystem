@@ -4,9 +4,9 @@ using System.Data.SqlClient;
 
 namespace DRDLPSystemDAL
 {
-	public static class ConnectionHandling
+	internal static class ConnectionHandling
 	{
-		public static EntityConnectionStringBuilder GetSpecificEntityConnectionStringBuilder(string dataSource, string initialCatalogue, string userID, 
+		internal static EntityConnectionStringBuilder GetSpecificEntityConnectionStringBuilder(string dataSource, string initialCatalogue, string userID, 
 																							 string password, bool useWindoesAutentification = false)
 		{
 			if (string.IsNullOrEmpty(dataSource))
