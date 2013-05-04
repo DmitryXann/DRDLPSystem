@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using DRDLPRegistry;
+using DRDLPCore.Registry;
 using System.Windows.Controls;
 
 namespace DRDLPAssociationEdit

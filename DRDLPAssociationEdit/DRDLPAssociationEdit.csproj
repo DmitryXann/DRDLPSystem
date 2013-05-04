@@ -118,12 +118,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DRDLPRegistry\DRDLPRegistry.csproj">
-      <Project>{4c2a3903-895f-4b5e-b5c9-1df088dba7da}</Project>
-      <Name>DRDLPRegistry</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="windowIcon.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -142,6 +136,12 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DRDLPCore\DRDLPCore.csproj">
+      <Project>{8cac77c3-ac5c-4d8d-b018-61d554635257}</Project>
+      <Name>DRDLPCore</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
