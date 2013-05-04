@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 using DRDLPCore.FileTranfsormation;
-using DRDLPRegistry;
+using DRDLPCore.Registry;
 
 namespace DRDLPCore.Helpres.ClientGUIHelpers
 {

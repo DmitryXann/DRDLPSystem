@@ -7,8 +7,8 @@ using System.IO.Compression;
 using System.Linq;
 using System.Security;
 using System.Security.AccessControl;
+using DRDLPCore.Registry;
 using DRDLPCore.WindowsAdministation;
-using DRDLPRegistry;
 using DRDLPCore.Helpres;
 
 namespace DRDLPCore.FileTranfsormation
