@@ -1,10 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TEST_PROJECT", "FilePreparation\TEST_PROJECT.csproj", "{CC0C3E48-6A5A-4B7E-A39E-ADAF162C69F4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TEST_CONSOLE", "TEST_CONSOLE\TEST_CONSOLE.csproj", "{8306F110-C8D7-4160-B820-2B57A1AA9F6D}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRDLPSystemDAL", "DRDLPSystemDAL\DRDLPSystemDAL.csproj", "{47D22AF7-FCD5-46A7-A995-2C246E775353}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRDLPWindowsService", "DRDLPWindowsService\DRDLPWindowsService.csproj", "{61FF12F8-961F-4D7C-BDD0-96D275C91981}"
@@ -23,14 +19,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CC0C3E48-6A5A-4B7E-A39E-ADAF162C69F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CC0C3E48-6A5A-4B7E-A39E-ADAF162C69F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CC0C3E48-6A5A-4B7E-A39E-ADAF162C69F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CC0C3E48-6A5A-4B7E-A39E-ADAF162C69F4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8306F110-C8D7-4160-B820-2B57A1AA9F6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8306F110-C8D7-4160-B820-2B57A1AA9F6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8306F110-C8D7-4160-B820-2B57A1AA9F6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8306F110-C8D7-4160-B820-2B57A1AA9F6D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{47D22AF7-FCD5-46A7-A995-2C246E775353}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{47D22AF7-FCD5-46A7-A995-2C246E775353}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47D22AF7-FCD5-46A7-A995-2C246E775353}.Release|Any CPU.ActiveCfg = Release|Any CPU
