@@ -56,7 +56,7 @@
     <Content Include="appIco.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DRDLPNet4.5\DRDLPCore.csproj">
+    <ProjectReference Include="..\DRDLPCore\DRDLPCore.csproj">
       <Project>{8cac77c3-ac5c-4d8d-b018-61d554635257}</Project>
       <Name>DRDLPCore</Name>
     </ProjectReference>
