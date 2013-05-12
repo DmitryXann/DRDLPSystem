@@ -116,7 +116,6 @@
     </EntityDeploy>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.Config" />
     <None Include="DRDLPModel.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>DRDLPModel.edmx</DependentUpon>

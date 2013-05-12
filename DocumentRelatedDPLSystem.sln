@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRDLPSystemDAL", "DRDLPSystemDAL\DRDLPSystemDAL.csproj", "{47D22AF7-FCD5-46A7-A995-2C246E775353}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRDLPWindowsService", "DRDLPWindowsService\DRDLPWindowsService.csproj", "{61FF12F8-961F-4D7C-BDD0-96D275C91981}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRDLPStandAloneFileTransformation", "DRDLPStandAloneFileTransformation\DRDLPStandAloneFileTransformation.csproj", "{857AD7A7-57B0-49C2-9E16-B168F05DB493}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRDLPClipboardWatchDog", "DRDLPClipboardWatchDog\DRDLPClipboardWatchDog.csproj", "{E7E5A0C1-E5CF-4B16-8F52-2C89E613332D}"
@@ -12,6 +10,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRDLPAssociationEdit", "DRDLPAssociationEdit\DRDLPAssociationEdit.csproj", "{A1011BC3-4293-4346-A699-E88C27157ADC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRDLPCore", "DRDLPCore\DRDLPCore.csproj", "{8CAC77C3-AC5C-4D8D-B018-61D554635257}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRDLPWCFService", "DRDLPWCFService\DRDLPWCFService.csproj", "{E3B1E84F-A133-4E14-8A57-04C869F0F2BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRDLPStandAloneWindowsService", "DRDLPStandAloneWindowsService\DRDLPStandAloneWindowsService.csproj", "{61FF12F8-961F-4D7C-BDD0-96D275C91981}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRDLPWindowsService", "DRDLPWindowsService\DRDLPWindowsService.csproj", "{6C9C771B-C474-4713-B5D3-80BE3A6A2891}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +27,6 @@ Global
 		{47D22AF7-FCD5-46A7-A995-2C246E775353}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47D22AF7-FCD5-46A7-A995-2C246E775353}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47D22AF7-FCD5-46A7-A995-2C246E775353}.Release|Any CPU.Build.0 = Release|Any CPU
-		{61FF12F8-961F-4D7C-BDD0-96D275C91981}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{61FF12F8-961F-4D7C-BDD0-96D275C91981}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{61FF12F8-961F-4D7C-BDD0-96D275C91981}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{61FF12F8-961F-4D7C-BDD0-96D275C91981}.Release|Any CPU.Build.0 = Release|Any CPU
 		{857AD7A7-57B0-49C2-9E16-B168F05DB493}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{857AD7A7-57B0-49C2-9E16-B168F05DB493}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{857AD7A7-57B0-49C2-9E16-B168F05DB493}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -43,6 +43,18 @@ Global
 		{8CAC77C3-AC5C-4D8D-B018-61D554635257}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8CAC77C3-AC5C-4D8D-B018-61D554635257}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8CAC77C3-AC5C-4D8D-B018-61D554635257}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3B1E84F-A133-4E14-8A57-04C869F0F2BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3B1E84F-A133-4E14-8A57-04C869F0F2BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3B1E84F-A133-4E14-8A57-04C869F0F2BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3B1E84F-A133-4E14-8A57-04C869F0F2BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61FF12F8-961F-4D7C-BDD0-96D275C91981}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61FF12F8-961F-4D7C-BDD0-96D275C91981}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61FF12F8-961F-4D7C-BDD0-96D275C91981}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61FF12F8-961F-4D7C-BDD0-96D275C91981}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C9C771B-C474-4713-B5D3-80BE3A6A2891}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C9C771B-C474-4713-B5D3-80BE3A6A2891}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C9C771B-C474-4713-B5D3-80BE3A6A2891}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C9C771B-C474-4713-B5D3-80BE3A6A2891}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
