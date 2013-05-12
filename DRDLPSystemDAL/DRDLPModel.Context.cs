@@ -13,7 +13,7 @@ namespace DRDLPSystemDAL
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class DRDLPModelContainer : DbContext
+    internal partial class DRDLPModelContainer : DbContext
     {
         public DRDLPModelContainer()
             : base("name=DRDLPModelContainer")
@@ -33,5 +33,6 @@ namespace DRDLPSystemDAL
         public DbSet<UserAccess> UserAccessSet { get; set; }
         public DbSet<DocumentPath> DocumentPathSet { get; set; }
         public DbSet<AccessLog> AccessLogSet { get; set; }
+        public DbSet<DocumentVersionChange> DocumentVersionChangeSet { get; set; }
     }
 }

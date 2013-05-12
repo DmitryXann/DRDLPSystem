@@ -17,9 +17,10 @@ namespace DRDLPSystemDAL
         public AccessLog()
         {
             this.LogEntryProcessed = false;
+            this.Hardware = new HashSet<Hardware>();
         }
     
-        public int Id { get; set; }
+        public long Id { get; set; }
         public AccessLogAccessType AccessType { get; set; }
         public System.DateTime AccessDateTime { get; set; }
         public bool LogEntryProcessed { get; set; }
@@ -29,6 +30,6 @@ namespace DRDLPSystemDAL
         public virtual PC PC { get; set; }
         public virtual DocumentPath DocumentPath { get; set; }
         public virtual UserAccess UserAccess { get; set; }
-        public virtual Hardware Hardware { get; set; }
+        public virtual ICollection<Hardware> Hardware { get; set; }
     }
 }

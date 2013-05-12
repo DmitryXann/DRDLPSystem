@@ -6,27 +6,7 @@ namespace DRDLPSystemDAL
 {
 	public partial class DRDLPModelDBContext
 	{
-		public void AddPC(PC pc)
-		{
-			if (pc == null)
-				throw new ArgumentNullException("pc");
-
-			if (string.IsNullOrEmpty(pc.PCHardwareBasedID))
-				throw new ArgumentException("pc.PCHardwareBasedID can`t be empty or null");
-
-			if (pc.Hardware == null)
-				throw new ArgumentNullException("pc");
-
-			if (!pc.Hardware.Any())
-				throw new ArgumentException("pc.Hardware cant be empty");
-
-			if (!pc.Hardware.All(el => _container.HardwareSet.Contains(el)))
-				throw new ArgumentException("all pc.Hardware entities must be in DB");
-
-			_container.PCSet.Add(pc);
-		}
-
-		public void AddPC(IEnumerable<Hardware> hardwares, string PCHardwareBasedID, bool valid = true)
+		public void AddPC(IEnumerable<Hardware> hardwares, string PCHardwareBasedID, string name, bool valid = true)
 		{
 			if (hardwares == null)
 				throw new ArgumentNullException("hardwares");
@@ -34,13 +14,16 @@ namespace DRDLPSystemDAL
 			if (!hardwares.Any())
 				throw new ArgumentException("pc.Hardware cant be empty");
 
-			if (!hardwares.All(el => _container.HardwareSet.Contains(el)))
+			if (!hardwares.All(el => _container.HardwareSet.Any(elem => elem.Id == el.Id)))
 				throw new ArgumentException("all pc.Hardware entities must be in DB");
 
 			if (string.IsNullOrEmpty(PCHardwareBasedID))
 				throw new ArgumentException("PCHardwareBasedID can`t be empty or null");
 
-			var newPC = new PC {PCHardwareBasedID = PCHardwareBasedID.ToLower().Trim(), Valid = valid};
+			if (string.IsNullOrEmpty(name))
+				throw new ArgumentException("name can`t be empty or null");
+
+			var newPC = new PC { PCHardwareBasedID = PCHardwareBasedID.ToLower().Trim(), Valid = valid, Name = name };
 
 			foreach (var hardware in hardwares)
 			{
@@ -50,36 +33,31 @@ namespace DRDLPSystemDAL
 			_container.PCSet.Add(newPC);
 		}
 
-		public void RemovePC(PC pc)
-		{
-			if (pc == null)
-				throw new ArgumentNullException("pc");
-
-			_container.PCSet.Remove(_container.PCSet.Attach(pc));
-		}
-
-		public PC AttachPC(PC pc)
-		{
-			if (pc == null)
-				throw new ArgumentNullException("pc");
-
-			return _container.PCSet.Attach(pc);
-		}
-
 		public void ChangePCValidation(PC pc,bool isPCValid)
 		{
 			if (pc == null)
 				throw new ArgumentNullException("pc");
 
-			if (!_container.PCSet.Contains(pc))
+			if (!_container.PCSet.Any(el => el.Id == pc.Id))
 				throw new ArgumentException("No such pc found in DB");
 
 			_container.PCSet.Attach(pc).Valid = isPCValid;
 		}
 
-		public PC GetPCByID(int pcID)
+		public bool IsPCExists(string hardwareBasedID)
 		{
-			return _container.PCSet.FirstOrDefault(el => el.Id == pcID);
+			if (string.IsNullOrEmpty(hardwareBasedID))
+				throw new ArgumentException("hardwareBasedID can`t be empty or null");
+
+			return _container.PCSet.Any(el => el.PCHardwareBasedID == hardwareBasedID);
+		}
+
+		public PC GetPCByHardwareBasedID(string hardwareBasedID)
+		{
+			if (string.IsNullOrEmpty(hardwareBasedID))
+				throw new ArgumentException("hardwareBasedID can`t be empty or null");
+
+			return _container.PCSet.FirstOrDefault(el => el.PCHardwareBasedID == hardwareBasedID);
 		}
 
 		public IEnumerable<PC> GetAllValidPC()
@@ -91,15 +69,5 @@ namespace DRDLPSystemDAL
 		{
 			return _container.PCSet.Where(el => !el.Valid).ToArray();
 		} 
-
-		public IEnumerable<PC> GetAllPC()
-		{
-			return _container.PCSet.ToArray();
-		} 
-
-		public long GetPCCount()
-		{
-			return _container.PCSet.LongCount();
-		}
 	}
 }

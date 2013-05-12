@@ -6,26 +6,12 @@ namespace DRDLPSystemDAL
 {
 	public partial class DRDLPModelDBContext
 	{
-		public void AddUser(User user)
-		{
-			if (user == null)
-				throw new ArgumentNullException("user");
-
-			if (user.PC == null)
-				throw new ArgumentNullException("user.PC");
-
-			if (_container.UserSet.Contains(user))
-				throw new ArgumentException("DB already contains this user");
-
-			_container.UserSet.Add(user);
-		}
-
 		public void AddUser(PC userPC, string login, bool valid = true)
 		{
 			if (userPC == null)
 				throw new ArgumentNullException("userPC");
 
-			if (!_container.PCSet.Contains(userPC))
+			if (!_container.PCSet.Any(el => el.Id == userPC.Id))
 				throw new ArgumentException("No such pc found in DB");
 			
 			if (string.IsNullOrEmpty(login))
@@ -38,41 +24,31 @@ namespace DRDLPSystemDAL
 			currentUserPC.Users.Add(user);
 		}
 
-		public User AttachUser(User user)
-		{
-			if (user == null)
-				throw new ArgumentNullException("user");
-
-			return _container.UserSet.Attach(user);
-		}
-
-		public void RemoveUser(User user)
-		{
-			if (user == null)
-				throw new ArgumentNullException("user");
-
-			_container.UserSet.Remove(_container.UserSet.Attach(user));
-		}
-
 		public void ChangeUserValidation(User user, bool isUserValid)
 		{
 			if (user == null)
 				throw new ArgumentNullException("user");
 
-			if (!_container.UserSet.Contains(user))
+			if (!_container.UserSet.Any(el => el.Id == user.Id))
 				throw new ArgumentException("No such user found in DB");
 
 			_container.UserSet.Attach(user).Valid = isUserValid;
 		}
 
-		public User GetUserByID(int userID)
+		public bool IsUserEsists(string login)
 		{
-			return _container.UserSet.FirstOrDefault(el => el.Id == userID);
+			if (string.IsNullOrEmpty(login))
+				throw new ArgumentException("login can`t be empty or null");
+
+			return _container.UserSet.Any(el => el.Login.ToLower().Trim() == login.ToLower().Trim());
 		}
 
-		public IEnumerable<User> GetAllUsers()
+		public bool IsUserExistsAndValid(string login)
 		{
-			return _container.UserSet.ToArray();
+			if (string.IsNullOrEmpty(login))
+				throw new ArgumentException("login can`t be empty or null");
+
+			return _container.UserSet.Any(el => (el.Login.ToLower().Trim() == login.ToLower().Trim()) && el.Valid);
 		}
 
 		public IEnumerable<User> GetAllValidUsers()
@@ -84,10 +60,5 @@ namespace DRDLPSystemDAL
 		{
 			return _container.UserSet.Where(el => !el.Valid).ToArray();
 		} 
-
-		public long GetUserCount()
-		{
-			return _container.UserSet.LongCount();
-		}
 	}
 }

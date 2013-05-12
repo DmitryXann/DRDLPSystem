@@ -28,8 +28,8 @@ namespace DRDLPSystemDAL
     
         public virtual PC PC { get; set; }
         public virtual ICollection<UserAccess> UserAccesses { get; set; }
-        public virtual Document LastAccessDocuments { get; set; }
-        public virtual Document LastChangedDocuments { get; set; }
+        public virtual Document LastAccessDocument { get; set; }
+        public virtual Document LastChangedDocument { get; set; }
         public virtual ICollection<AccessLog> AccessLog { get; set; }
     }
 }

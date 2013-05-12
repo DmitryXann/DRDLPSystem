@@ -55,6 +55,9 @@
     <Compile Include="DocumentPath.cs">
       <DependentUpon>DRDLPModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="DocumentVersionChange.cs">
+      <DependentUpon>DRDLPModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="DRDLPModel.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -76,6 +79,8 @@
     <Compile Include="DRDLPModelDBContextEntityProcessing\Administrator.cs" />
     <Compile Include="DRDLPModelDBContextEntityProcessing\Document.cs" />
     <Compile Include="DRDLPModelDBContextEntityProcessing\DocumentPath.cs" />
+    <Compile Include="DRDLPModelDBContextEntityProcessing\DocumentVersionChange.cs" />
+    <Compile Include="DRDLPModelDBContextEntityProcessing\GenericMembers.cs" />
     <Compile Include="DRDLPModelDBContextEntityProcessing\Hardware.cs" />
     <Compile Include="DRDLPModelDBContextEntityProcessing\PC.cs" />
     <Compile Include="DRDLPModelDBContextEntityProcessing\User.cs" />
@@ -86,6 +91,10 @@
     <Compile Include="HardwareTypeEnum.cs">
       <DependentUpon>DRDLPModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="InterfaceEntityInmplementation\User.cs" />
+    <Compile Include="Interfaces\IHardware.cs" />
+    <Compile Include="InterfaceEntityInmplementation\Hardware.cs" />
+    <Compile Include="Interfaces\IUser.cs" />
     <Compile Include="PC.cs">
       <DependentUpon>DRDLPModel.tt</DependentUpon>
     </Compile>
@@ -107,6 +116,7 @@
     </EntityDeploy>
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.Config" />
     <None Include="DRDLPModel.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>DRDLPModel.edmx</DependentUpon>
@@ -128,6 +138,7 @@
   <ItemGroup>
     <Content Include="ReadMe.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

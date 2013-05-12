@@ -12,19 +12,18 @@ namespace DRDLPSystemDAL
     using System;
     using System.Collections.Generic;
     
-    public partial class UserAccess
+    public partial class DocumentVersionChange
     {
-        public UserAccess()
+        public DocumentVersionChange()
         {
-            this.Documents = new HashSet<Document>();
-            this.Users = new HashSet<User>();
-            this.AccessLog = new HashSet<AccessLog>();
+            this.Version = 0;
+            this.DocumentPart = "\"\"";
         }
     
-        public UserAccessAccessTypeEnum AccessType { get; set; }
+        public long Id { get; set; }
+        public long Version { get; set; }
+        public string DocumentPart { get; set; }
     
-        public virtual ICollection<Document> Documents { get; set; }
-        public virtual ICollection<User> Users { get; set; }
-        public virtual ICollection<AccessLog> AccessLog { get; set; }
+        public virtual Document Document { get; set; }
     }
 }

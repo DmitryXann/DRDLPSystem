@@ -1,6 +1,6 @@
 ﻿namespace DRDLPSystemDAL
 {
-	public partial class DRDLPModelContainer
+	internal partial class DRDLPModelContainer
 	{
 		public DRDLPModelContainer(string connectionString)
 			: base(connectionString)

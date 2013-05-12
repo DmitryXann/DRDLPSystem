@@ -14,7 +14,10 @@
     <EntitySet Name="UserAccessSet" EntityType="DRDLPModel.Store.UserAccessSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="DocumentPathSet" EntityType="DRDLPModel.Store.DocumentPathSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="AccessLogSet" EntityType="DRDLPModel.Store.AccessLogSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="DocumentVersionChangeSet" EntityType="DRDLPModel.Store.DocumentVersionChangeSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="DocumentsUserAccess" EntityType="DRDLPModel.Store.DocumentsUserAccess" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="UserUserAccess" EntityType="DRDLPModel.Store.UserUserAccess" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="HardwareAccessLog" EntityType="DRDLPModel.Store.HardwareAccessLog" store:Type="Tables" Schema="dbo" />
     <AssociationSet Name="PCHardware" Association="DRDLPModel.Store.PCHardware">
       <End Role="PC" EntitySet="PCSet" />
       <End Role="Hardware" EntitySet="HardwareSet" />
@@ -27,9 +30,13 @@
       <End Role="PC" EntitySet="PCSet" />
       <End Role="Documents" EntitySet="DocumentSet" />
     </AssociationSet>
-    <AssociationSet Name="DocumentsUserAccess" Association="DRDLPModel.Store.DocumentsUserAccess">
+    <AssociationSet Name="FK_DocumentsUserAccess_Documents" Association="DRDLPModel.Store.FK_DocumentsUserAccess_Documents">
       <End Role="Documents" EntitySet="DocumentSet" />
+      <End Role="DocumentsUserAccess" EntitySet="DocumentsUserAccess" />
+    </AssociationSet>
+    <AssociationSet Name="FK_DocumentsUserAccess_UserAccess" Association="DRDLPModel.Store.FK_DocumentsUserAccess_UserAccess">
       <End Role="UserAccess" EntitySet="UserAccessSet" />
+      <End Role="DocumentsUserAccess" EntitySet="DocumentsUserAccess" />
     </AssociationSet>
     <AssociationSet Name="FK_UserUserAccess_User" Association="DRDLPModel.Store.FK_UserUserAccess_User">
       <End Role="User" EntitySet="UserSet" />
@@ -75,9 +82,17 @@
       <End Role="UserAccess" EntitySet="UserAccessSet" />
       <End Role="AccessLog" EntitySet="AccessLogSet" />
     </AssociationSet>
-    <AssociationSet Name="HardwareAccessLog" Association="DRDLPModel.Store.HardwareAccessLog">
+    <AssociationSet Name="FK_HardwareAccessLog_Hardware" Association="DRDLPModel.Store.FK_HardwareAccessLog_Hardware">
       <End Role="Hardware" EntitySet="HardwareSet" />
+      <End Role="HardwareAccessLog" EntitySet="HardwareAccessLog" />
+    </AssociationSet>
+    <AssociationSet Name="FK_HardwareAccessLog_AccessLog" Association="DRDLPModel.Store.FK_HardwareAccessLog_AccessLog">
       <End Role="AccessLog" EntitySet="AccessLogSet" />
+      <End Role="HardwareAccessLog" EntitySet="HardwareAccessLog" />
+    </AssociationSet>
+    <AssociationSet Name="DocumentDocumentVersionChange" Association="DRDLPModel.Store.DocumentDocumentVersionChange">
+      <End Role="Document" EntitySet="DocumentSet" />
+      <End Role="DocumentVersionChange" EntitySet="DocumentVersionChangeSet" />
     </AssociationSet>
   </EntityContainer>
   <EntityType Name="AdministratorSet">
@@ -107,6 +122,7 @@
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="Valid" Type="bit" Nullable="false" DefaultValue="true" />
     <Property Name="PCHardwareBasedID" Type="nvarchar(max)" Nullable="false" DefaultValue="&quot;&quot;" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" DefaultValue="&quot;&quot;" />
   </EntityType>
   <EntityType Name="UserSet">
     <Key>
@@ -115,26 +131,26 @@
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="Login" Type="nvarchar(max)" Nullable="false" DefaultValue="&quot;&quot;" />
     <Property Name="Valid" Type="bit" Nullable="false" DefaultValue="true" />
-    <Property Name="PC_Id" Type="int" Nullable="false" />
+    <Property Name="PC_Id" Type="int" Nullable="true" />
+    <Property Name="LastAccessDocuments_Id" Type="bigint" Nullable="true" />
+    <Property Name="LastChangedDocuments_Id" Type="bigint" Nullable="true" />
   </EntityType>
   <EntityType Name="DocumentSet">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="DocumentID" Type="nvarchar(max)" Nullable="false" DefaultValue="&quot;&quot;" />
+    <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="DocumentID" Type="uniqueidentifier" Nullable="false" />
     <Property Name="LastChange" Type="datetime" Nullable="false" />
     <Property Name="Version" Type="bigint" Nullable="false" DefaultValue="0" />
-    <Property Name="PC_Id" Type="int" Nullable="false" />
-    <Property Name="LastUserAccess_Id" Type="int" Nullable="false" />
-    <Property Name="LastUserAccessWithChanges_Id" Type="int" Nullable="false" />
+    <Property Name="DocumentPart" Type="nvarchar(max)" Nullable="false" DefaultValue="&quot;&quot;" />
+    <Property Name="PC_Id" Type="int" Nullable="true" />
   </EntityType>
   <EntityType Name="UserAccessSet">
     <Key>
       <PropertyRef Name="AccessType" />
     </Key>
     <Property Name="AccessType" Type="tinyint" Nullable="false" />
-    <Property Name="Documents_Id" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="DocumentPathSet">
     <Key>
@@ -142,23 +158,39 @@
     </Key>
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="Path" Type="nvarchar(max)" Nullable="false" DefaultValue="&quot;&quot;" />
-    <Property Name="PC_Id" Type="int" Nullable="false" />
-    <Property Name="Document_Id" Type="int" Nullable="false" />
+    <Property Name="PC_Id" Type="int" Nullable="true" />
+    <Property Name="Document_Id" Type="bigint" Nullable="false" />
   </EntityType>
   <EntityType Name="AccessLogSet">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="AccessType" Type="tinyint" Nullable="false" />
     <Property Name="AccessDateTime" Type="datetime" Nullable="false" />
     <Property Name="LogEntryProcessed" Type="bit" Nullable="false" DefaultValue="false" />
-    <Property Name="Document_Id" Type="int" Nullable="false" />
-    <Property Name="User_Id" Type="int" Nullable="false" />
-    <Property Name="PC_Id" Type="int" Nullable="false" />
-    <Property Name="DocumentPath_Id" Type="int" Nullable="false" />
+    <Property Name="Document_Id" Type="bigint" Nullable="true" />
+    <Property Name="User_Id" Type="int" Nullable="true" />
+    <Property Name="PC_Id" Type="int" Nullable="true" />
+    <Property Name="DocumentPath_Id" Type="int" Nullable="true" />
+    <Property Name="UserAccess_AccessType" Type="tinyint" Nullable="true" />
+  </EntityType>
+  <EntityType Name="DocumentVersionChangeSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Version" Type="bigint" Nullable="false" DefaultValue="0" />
+    <Property Name="DocumentPart" Type="nvarchar(max)" Nullable="false" DefaultValue="&quot;&quot;" />
+    <Property Name="Document_Id" Type="bigint" Nullable="true" />
+  </EntityType>
+  <EntityType Name="DocumentsUserAccess">
+    <Key>
+      <PropertyRef Name="Documents_Id" />
+      <PropertyRef Name="UserAccess_AccessType" />
+    </Key>
+    <Property Name="Documents_Id" Type="bigint" Nullable="false" />
     <Property Name="UserAccess_AccessType" Type="tinyint" Nullable="false" />
-    <Property Name="Hardware_Id" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="UserUserAccess">
     <Key>
@@ -167,6 +199,14 @@
     </Key>
     <Property Name="Users_Id" Type="int" Nullable="false" />
     <Property Name="UserAccesses_AccessType" Type="tinyint" Nullable="false" />
+  </EntityType>
+  <EntityType Name="HardwareAccessLog">
+    <Key>
+      <PropertyRef Name="Hardware_Id" />
+      <PropertyRef Name="AccessLog_Id" />
+    </Key>
+    <Property Name="Hardware_Id" Type="int" Nullable="false" />
+    <Property Name="AccessLog_Id" Type="bigint" Nullable="false" />
   </EntityType>
   <Association Name="PCHardware">
     <End Role="PC" Type="DRDLPModel.Store.PCSet" Multiplicity="1" />
@@ -181,7 +221,7 @@
     </ReferentialConstraint>
   </Association>
   <Association Name="PCUser">
-    <End Role="PC" Type="DRDLPModel.Store.PCSet" Multiplicity="1" />
+    <End Role="PC" Type="DRDLPModel.Store.PCSet" Multiplicity="0..1" />
     <End Role="User" Type="DRDLPModel.Store.UserSet" Multiplicity="*" />
     <ReferentialConstraint>
       <Principal Role="PC">
@@ -193,7 +233,7 @@
     </ReferentialConstraint>
   </Association>
   <Association Name="PCDocuments">
-    <End Role="PC" Type="DRDLPModel.Store.PCSet" Multiplicity="1" />
+    <End Role="PC" Type="DRDLPModel.Store.PCSet" Multiplicity="0..1" />
     <End Role="Documents" Type="DRDLPModel.Store.DocumentSet" Multiplicity="*" />
     <ReferentialConstraint>
       <Principal Role="PC">
@@ -204,45 +244,33 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="DocumentsUserAccess">
-    <End Role="Documents" Type="DRDLPModel.Store.DocumentSet" Multiplicity="1" />
-    <End Role="UserAccess" Type="DRDLPModel.Store.UserAccessSet" Multiplicity="*" />
+  <Association Name="DocumentsUser">
+    <End Role="Documents" Type="DRDLPModel.Store.DocumentSet" Multiplicity="0..1" />
+    <End Role="User" Type="DRDLPModel.Store.UserSet" Multiplicity="*" />
     <ReferentialConstraint>
       <Principal Role="Documents">
         <PropertyRef Name="Id" />
       </Principal>
-      <Dependent Role="UserAccess">
-        <PropertyRef Name="Documents_Id" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="DocumentsUser">
-    <End Role="Documents" Type="DRDLPModel.Store.DocumentSet" Multiplicity="*" />
-    <End Role="User" Type="DRDLPModel.Store.UserSet" Multiplicity="1" />
-    <ReferentialConstraint>
-      <Principal Role="User">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="Documents">
-        <PropertyRef Name="LastUserAccess_Id" />
+      <Dependent Role="User">
+        <PropertyRef Name="LastAccessDocuments_Id" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
   <Association Name="DocumentsUser1">
-    <End Role="Documents" Type="DRDLPModel.Store.DocumentSet" Multiplicity="*" />
-    <End Role="User" Type="DRDLPModel.Store.UserSet" Multiplicity="1" />
+    <End Role="Documents" Type="DRDLPModel.Store.DocumentSet" Multiplicity="0..1" />
+    <End Role="User" Type="DRDLPModel.Store.UserSet" Multiplicity="*" />
     <ReferentialConstraint>
-      <Principal Role="User">
+      <Principal Role="Documents">
         <PropertyRef Name="Id" />
       </Principal>
-      <Dependent Role="Documents">
-        <PropertyRef Name="LastUserAccessWithChanges_Id" />
+      <Dependent Role="User">
+        <PropertyRef Name="LastChangedDocuments_Id" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
   <Association Name="DocumentPathPC">
     <End Role="DocumentPath" Type="DRDLPModel.Store.DocumentPathSet" Multiplicity="*" />
-    <End Role="PC" Type="DRDLPModel.Store.PCSet" Multiplicity="1" />
+    <End Role="PC" Type="DRDLPModel.Store.PCSet" Multiplicity="0..1" />
     <ReferentialConstraint>
       <Principal Role="PC">
         <PropertyRef Name="Id" />
@@ -265,7 +293,7 @@
     </ReferentialConstraint>
   </Association>
   <Association Name="DocumentAccessLog">
-    <End Role="Document" Type="DRDLPModel.Store.DocumentSet" Multiplicity="1" />
+    <End Role="Document" Type="DRDLPModel.Store.DocumentSet" Multiplicity="0..1" />
     <End Role="AccessLog" Type="DRDLPModel.Store.AccessLogSet" Multiplicity="*" />
     <ReferentialConstraint>
       <Principal Role="Document">
@@ -277,7 +305,7 @@
     </ReferentialConstraint>
   </Association>
   <Association Name="UserAccessLog">
-    <End Role="User" Type="DRDLPModel.Store.UserSet" Multiplicity="1" />
+    <End Role="User" Type="DRDLPModel.Store.UserSet" Multiplicity="0..1" />
     <End Role="AccessLog" Type="DRDLPModel.Store.AccessLogSet" Multiplicity="*" />
     <ReferentialConstraint>
       <Principal Role="User">
@@ -290,7 +318,7 @@
   </Association>
   <Association Name="AccessLogPC">
     <End Role="AccessLog" Type="DRDLPModel.Store.AccessLogSet" Multiplicity="*" />
-    <End Role="PC" Type="DRDLPModel.Store.PCSet" Multiplicity="1" />
+    <End Role="PC" Type="DRDLPModel.Store.PCSet" Multiplicity="0..1" />
     <ReferentialConstraint>
       <Principal Role="PC">
         <PropertyRef Name="Id" />
@@ -301,7 +329,7 @@
     </ReferentialConstraint>
   </Association>
   <Association Name="DocumentPathAccessLog">
-    <End Role="DocumentPath" Type="DRDLPModel.Store.DocumentPathSet" Multiplicity="1" />
+    <End Role="DocumentPath" Type="DRDLPModel.Store.DocumentPathSet" Multiplicity="0..1" />
     <End Role="AccessLog" Type="DRDLPModel.Store.AccessLogSet" Multiplicity="*" />
     <ReferentialConstraint>
       <Principal Role="DocumentPath">
@@ -313,7 +341,7 @@
     </ReferentialConstraint>
   </Association>
   <Association Name="UserAccessAccessLog">
-    <End Role="UserAccess" Type="DRDLPModel.Store.UserAccessSet" Multiplicity="1" />
+    <End Role="UserAccess" Type="DRDLPModel.Store.UserAccessSet" Multiplicity="0..1" />
     <End Role="AccessLog" Type="DRDLPModel.Store.AccessLogSet" Multiplicity="*" />
     <ReferentialConstraint>
       <Principal Role="UserAccess">
@@ -324,15 +352,39 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="HardwareAccessLog">
-    <End Role="Hardware" Type="DRDLPModel.Store.HardwareSet" Multiplicity="1" />
-    <End Role="AccessLog" Type="DRDLPModel.Store.AccessLogSet" Multiplicity="*" />
+  <Association Name="DocumentDocumentVersionChange">
+    <End Role="Document" Type="DRDLPModel.Store.DocumentSet" Multiplicity="0..1" />
+    <End Role="DocumentVersionChange" Type="DRDLPModel.Store.DocumentVersionChangeSet" Multiplicity="*" />
     <ReferentialConstraint>
-      <Principal Role="Hardware">
+      <Principal Role="Document">
         <PropertyRef Name="Id" />
       </Principal>
-      <Dependent Role="AccessLog">
-        <PropertyRef Name="Hardware_Id" />
+      <Dependent Role="DocumentVersionChange">
+        <PropertyRef Name="Document_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_DocumentsUserAccess_Documents">
+    <End Role="Documents" Type="DRDLPModel.Store.DocumentSet" Multiplicity="1" />
+    <End Role="DocumentsUserAccess" Type="DRDLPModel.Store.DocumentsUserAccess" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Documents">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="DocumentsUserAccess">
+        <PropertyRef Name="Documents_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_DocumentsUserAccess_UserAccess">
+    <End Role="DocumentsUserAccess" Type="DRDLPModel.Store.DocumentsUserAccess" Multiplicity="*" />
+    <End Role="UserAccess" Type="DRDLPModel.Store.UserAccessSet" Multiplicity="1" />
+    <ReferentialConstraint>
+      <Principal Role="UserAccess">
+        <PropertyRef Name="AccessType" />
+      </Principal>
+      <Dependent Role="DocumentsUserAccess">
+        <PropertyRef Name="UserAccess_AccessType" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
@@ -360,16 +412,40 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
+  <Association Name="FK_HardwareAccessLog_Hardware">
+    <End Role="Hardware" Type="DRDLPModel.Store.HardwareSet" Multiplicity="1" />
+    <End Role="HardwareAccessLog" Type="DRDLPModel.Store.HardwareAccessLog" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Hardware">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="HardwareAccessLog">
+        <PropertyRef Name="Hardware_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_HardwareAccessLog_AccessLog">
+    <End Role="HardwareAccessLog" Type="DRDLPModel.Store.HardwareAccessLog" Multiplicity="*" />
+    <End Role="AccessLog" Type="DRDLPModel.Store.AccessLogSet" Multiplicity="1" />
+    <ReferentialConstraint>
+      <Principal Role="AccessLog">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="HardwareAccessLog">
+        <PropertyRef Name="AccessLog_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
 </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="DRDLPModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" annotation:UseStrongSpatialTypes="false">
-        <EntityContainer Name="DRDLPModelContainer" annotation:LazyLoadingEnabled="true">
+        <EntityContainer Name="DRDLPModelContainer" annotation:LazyLoadingEnabled="true" cg:TypeAccess="Internal">
           <EntitySet Name="AdministratorSet" EntityType="DRDLPModel.Administrator" />
           <EntitySet Name="HardwareSet" EntityType="DRDLPModel.Hardware" />
           <EntitySet Name="PCSet" EntityType="DRDLPModel.PC" />
           <EntitySet Name="UserSet" EntityType="DRDLPModel.User" />
-          <EntitySet Name="DocumentSet" EntityType="DRDLPModel.Document" />
+          <EntitySet Name="DocumentSet" EntityType="DRDLPModel.Document"/>
           <AssociationSet Name="PCHardware" Association="DRDLPModel.PCHardware">
             <End Role="PC" EntitySet="PCSet" />
             <End Role="Hardware" EntitySet="HardwareSet" />
@@ -433,33 +509,38 @@
             <End Role="Hardware" EntitySet="HardwareSet" />
             <End Role="AccessLog" EntitySet="AccessLogSet" />
           </AssociationSet>
+          <EntitySet Name="DocumentVersionChangeSet" EntityType="DRDLPModel.DocumentVersionChange" />
+          <AssociationSet Name="DocumentDocumentVersionChange" Association="DRDLPModel.DocumentDocumentVersionChange">
+            <End Role="Document" EntitySet="DocumentSet" />
+            <End Role="DocumentVersionChange" EntitySet="DocumentVersionChangeSet" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="Administrator">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" Type="Int32" />
           <Property Type="String" Name="Login" Nullable="false" DefaultValue="&quot;&quot;" />
           <Property Type="String" Name="Password" Nullable="false" DefaultValue="&quot;&quot;" />
           <Property Type="Boolean" Name="NeedsToChangePassword" Nullable="false" DefaultValue="False" />
         </EntityType>
-        <EntityType Name="Hardware">
+        <EntityType Name="Hardware" cg:TypeAccess="Public">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Type="String" Name="HardwareID" Nullable="false" DefaultValue="&quot;&quot;" />
-          <Property Type="String" Name="Name" Nullable="false" DefaultValue="&quot;&quot;" />
-          <Property Type="String" Name="OtherInfo" Nullable="false" DefaultValue="&quot;&quot;" />
+          <Property Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" Type="Int32" />
+          <Property Name="HardwareID" Nullable="false" DefaultValue="&quot;&quot;" Type="String" />
+          <Property Name="Name" Nullable="false" DefaultValue="&quot;&quot;" Type="String" />
+          <Property Name="OtherInfo" Nullable="false" DefaultValue="&quot;&quot;" Type="String" />
           <NavigationProperty Name="PC" Relationship="DRDLPModel.PCHardware" FromRole="Hardware" ToRole="PC" />
-          <Property Type="DRDLPModel.HardwareTypeEnum" Name="Type" Nullable="false" />
+          <Property Name="Type" Nullable="false" Type="DRDLPModel.HardwareTypeEnum" />
           <NavigationProperty Name="AccessLog" Relationship="DRDLPModel.HardwareAccessLog" FromRole="Hardware" ToRole="AccessLog" />
         </EntityType>
-        <EntityType Name="PC">
+        <EntityType Name="PC" cg:TypeAccess="Public">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" Type="Int32" />
           <Property Type="Boolean" Name="Valid" Nullable="false" DefaultValue="True" />
           <NavigationProperty Name="Hardware" Relationship="DRDLPModel.PCHardware" FromRole="PC" ToRole="Hardware" />
           <NavigationProperty Name="Users" Relationship="DRDLPModel.PCUser" FromRole="PC" ToRole="User" />
@@ -467,26 +548,27 @@
           <Property Type="String" Name="PCHardwareBasedID" Nullable="false" DefaultValue="&quot;&quot;" />
           <NavigationProperty Name="DocumentPath" Relationship="DRDLPModel.DocumentPathPC" FromRole="PC" ToRole="DocumentPath" />
           <NavigationProperty Name="AccessLog" Relationship="DRDLPModel.AccessLogPC" FromRole="PC" ToRole="AccessLog" />
+          <Property Type="String" Name="Name" Nullable="false" DefaultValue="&quot;&quot;" />
         </EntityType>
         <EntityType Name="User">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" Type="Int32" />
           <Property Type="String" Name="Login" Nullable="false" DefaultValue="&quot;&quot;" />
           <Property Type="Boolean" Name="Valid" Nullable="false" DefaultValue="True" />
           <NavigationProperty Name="PC" Relationship="DRDLPModel.PCUser" FromRole="User" ToRole="PC" />
           <NavigationProperty Name="UserAccesses" Relationship="DRDLPModel.UserUserAccess" FromRole="User" ToRole="UserAccess" />
-          <NavigationProperty Name="LastAccessDocuments" Relationship="DRDLPModel.DocumentsUser" FromRole="User" ToRole="Documents" />
-          <NavigationProperty Name="LastChangedDocuments" Relationship="DRDLPModel.DocumentsUser1" FromRole="User" ToRole="Documents" />
+          <NavigationProperty Name="LastAccessDocument" Relationship="DRDLPModel.DocumentsUser" FromRole="User" ToRole="Documents" />
+          <NavigationProperty Name="LastChangedDocument" Relationship="DRDLPModel.DocumentsUser1" FromRole="User" ToRole="Documents" />
           <NavigationProperty Name="AccessLog" Relationship="DRDLPModel.UserAccessLog" FromRole="User" ToRole="AccessLog" />
         </EntityType>
-        <EntityType Name="Document">
+        <EntityType Name="Document" cg:TypeAccess="Public">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Type="String" Name="DocumentID" Nullable="false" DefaultValue="&quot;&quot;" />
+          <Property Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" Type="Int64" />
+          <Property Type="Guid" Name="DocumentID" Nullable="false" />
           <Property Type="DateTime" Name="LastChange" Nullable="false" />
           <NavigationProperty Name="PC" Relationship="DRDLPModel.PCDocuments" FromRole="Documents" ToRole="PC" />
           <NavigationProperty Name="UserAccess" Relationship="DRDLPModel.DocumentsUserAccess" FromRole="Documents" ToRole="UserAccess" />
@@ -495,17 +577,19 @@
           <NavigationProperty Name="DocumentPath" Relationship="DRDLPModel.DocumentDocumentPath" FromRole="Document" ToRole="DocumentPath" />
           <Property Type="Int64" Name="Version" Nullable="false" DefaultValue="0" />
           <NavigationProperty Name="AccessLog" Relationship="DRDLPModel.DocumentAccessLog" FromRole="Document" ToRole="AccessLog" />
+          <Property Type="String" Name="DocumentPart" Nullable="false" DefaultValue="&quot;&quot;" />
+          <NavigationProperty Name="DocumentVersionChange" Relationship="DRDLPModel.DocumentDocumentVersionChange" FromRole="Document" ToRole="DocumentVersionChange" />
         </EntityType>
         <Association Name="PCHardware">
           <End Type="DRDLPModel.PC" Role="PC" Multiplicity="1" />
           <End Type="DRDLPModel.Hardware" Role="Hardware" Multiplicity="*" />
         </Association>
         <Association Name="PCUser">
-          <End Type="DRDLPModel.PC" Role="PC" Multiplicity="1" />
+          <End Type="DRDLPModel.PC" Role="PC" Multiplicity="0..1" />
           <End Type="DRDLPModel.User" Role="User" Multiplicity="*" />
         </Association>
         <Association Name="PCDocuments">
-          <End Type="DRDLPModel.PC" Role="PC" Multiplicity="1" />
+          <End Type="DRDLPModel.PC" Role="PC" Multiplicity="0..1" />
           <End Type="DRDLPModel.Document" Role="Documents" Multiplicity="*" />
         </Association>
         <EnumType Name="HardwareTypeEnum" UnderlyingType="Byte">
@@ -525,7 +609,7 @@
           <NavigationProperty Name="AccessLog" Relationship="DRDLPModel.UserAccessAccessLog" FromRole="UserAccess" ToRole="AccessLog" />
         </EntityType>
         <Association Name="DocumentsUserAccess">
-          <End Type="DRDLPModel.Document" Role="Documents" Multiplicity="1" />
+          <End Type="DRDLPModel.Document" Role="Documents" Multiplicity="*" />
           <End Type="DRDLPModel.UserAccess" Role="UserAccess" Multiplicity="*" />
         </Association>
         <Association Name="UserUserAccess">
@@ -538,18 +622,18 @@
           <Member Name="AccessDenied" />
         </EnumType>
         <Association Name="DocumentsUser">
-          <End Type="DRDLPModel.Document" Role="Documents" Multiplicity="1" />
-          <End Type="DRDLPModel.User" Role="User" Multiplicity="1" />
+          <End Type="DRDLPModel.Document" Role="Documents" Multiplicity="0..1" />
+          <End Type="DRDLPModel.User" Role="User" Multiplicity="0..1" />
         </Association>
         <Association Name="DocumentsUser1">
-          <End Type="DRDLPModel.Document" Role="Documents" Multiplicity="1" />
-          <End Type="DRDLPModel.User" Role="User" Multiplicity="1" />
+          <End Type="DRDLPModel.Document" Role="Documents" Multiplicity="0..1" />
+          <End Type="DRDLPModel.User" Role="User" Multiplicity="0..1" />
         </Association>
         <EntityType Name="DocumentPath">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" Type="Int32" />
           <NavigationProperty Name="PC" Relationship="DRDLPModel.DocumentPathPC" FromRole="DocumentPath" ToRole="PC" />
           <NavigationProperty Name="Document" Relationship="DRDLPModel.DocumentDocumentPath" FromRole="DocumentPath" ToRole="Document" />
           <Property Type="String" Name="Path" Nullable="false" DefaultValue="&quot;&quot;" />
@@ -557,7 +641,7 @@
         </EntityType>
         <Association Name="DocumentPathPC">
           <End Type="DRDLPModel.DocumentPath" Role="DocumentPath" Multiplicity="*" />
-          <End Type="DRDLPModel.PC" Role="PC" Multiplicity="1" />
+          <End Type="DRDLPModel.PC" Role="PC" Multiplicity="0..1" />
         </Association>
         <Association Name="DocumentDocumentPath">
           <End Type="DRDLPModel.Document" Role="Document" Multiplicity="1" />
@@ -567,7 +651,7 @@
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" Type="Int64" />
           <NavigationProperty Name="Document" Relationship="DRDLPModel.DocumentAccessLog" FromRole="AccessLog" ToRole="Document" />
           <NavigationProperty Name="User" Relationship="DRDLPModel.UserAccessLog" FromRole="AccessLog" ToRole="User" />
           <Property Type="DRDLPModel.AccessLogAccessType" Name="AccessType" Nullable="false" />
@@ -579,11 +663,11 @@
           <Property Type="Boolean" Name="LogEntryProcessed" Nullable="false" DefaultValue="False" />
         </EntityType>
         <Association Name="DocumentAccessLog">
-          <End Type="DRDLPModel.Document" Role="Document" Multiplicity="1" />
+          <End Type="DRDLPModel.Document" Role="Document" Multiplicity="0..1" />
           <End Type="DRDLPModel.AccessLog" Role="AccessLog" Multiplicity="*" />
         </Association>
         <Association Name="UserAccessLog">
-          <End Type="DRDLPModel.User" Role="User" Multiplicity="1" />
+          <End Type="DRDLPModel.User" Role="User" Multiplicity="0..1" />
           <End Type="DRDLPModel.AccessLog" Role="AccessLog" Multiplicity="*" />
         </Association>
         <EnumType Name="AccessLogAccessType" UnderlyingType="Byte">
@@ -593,19 +677,32 @@
         </EnumType>
         <Association Name="AccessLogPC">
           <End Type="DRDLPModel.AccessLog" Role="AccessLog" Multiplicity="*" />
-          <End Type="DRDLPModel.PC" Role="PC" Multiplicity="1" />
+          <End Type="DRDLPModel.PC" Role="PC" Multiplicity="0..1" />
         </Association>
         <Association Name="DocumentPathAccessLog">
-          <End Type="DRDLPModel.DocumentPath" Role="DocumentPath" Multiplicity="1" />
+          <End Type="DRDLPModel.DocumentPath" Role="DocumentPath" Multiplicity="0..1" />
           <End Type="DRDLPModel.AccessLog" Role="AccessLog" Multiplicity="*" />
         </Association>
         <Association Name="UserAccessAccessLog">
-          <End Type="DRDLPModel.UserAccess" Role="UserAccess" Multiplicity="1" />
+          <End Type="DRDLPModel.UserAccess" Role="UserAccess" Multiplicity="0..1" />
           <End Type="DRDLPModel.AccessLog" Role="AccessLog" Multiplicity="*" />
         </Association>
         <Association Name="HardwareAccessLog">
-          <End Type="DRDLPModel.Hardware" Role="Hardware" Multiplicity="1" />
+          <End Type="DRDLPModel.Hardware" Role="Hardware" Multiplicity="*" />
           <End Type="DRDLPModel.AccessLog" Role="AccessLog" Multiplicity="*" />
+        </Association>
+        <EntityType Name="DocumentVersionChange">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int64" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int64" Name="Version" Nullable="false" DefaultValue="0" />
+          <Property Type="String" Name="DocumentPart" Nullable="false" DefaultValue="&quot;&quot;" />
+          <NavigationProperty Name="Document" Relationship="DRDLPModel.DocumentDocumentVersionChange" FromRole="DocumentVersionChange" ToRole="Document" />
+        </EntityType>
+        <Association Name="DocumentDocumentVersionChange">
+          <End Type="DRDLPModel.Document" Role="Document" Multiplicity="0..1" />
+          <End Type="DRDLPModel.DocumentVersionChange" Role="DocumentVersionChange" Multiplicity="*" />
         </Association>
       </Schema>
     </edmx:ConceptualModels>
@@ -640,6 +737,7 @@
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="Valid" ColumnName="Valid" />
           <ScalarProperty Name="PCHardwareBasedID" ColumnName="PCHardwareBasedID" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -659,6 +757,7 @@
           <ScalarProperty Name="DocumentID" ColumnName="DocumentID" />
           <ScalarProperty Name="LastChange" ColumnName="LastChange" />
           <ScalarProperty Name="Version" ColumnName="Version" />
+          <ScalarProperty Name="DocumentPart" ColumnName="DocumentPart" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -687,6 +786,15 @@
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
+    <EntitySetMapping Name="DocumentVersionChangeSet">
+      <EntityTypeMapping TypeName="IsTypeOf(DRDLPModel.DocumentVersionChange)">
+        <MappingFragment StoreEntitySet="DocumentVersionChangeSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Version" ColumnName="Version" />
+          <ScalarProperty Name="DocumentPart" ColumnName="DocumentPart" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
     <AssociationSetMapping Name="PCHardware" TypeName="DRDLPModel.PCHardware" StoreEntitySet="HardwareSet">
       <EndProperty Name="PC">
         <ScalarProperty Name="Id" ColumnName="PC_Id" />
@@ -702,6 +810,7 @@
       <EndProperty Name="User">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
+      <Condition ColumnName="PC_Id" IsNull="false" />
     </AssociationSetMapping>
     <AssociationSetMapping Name="PCDocuments" TypeName="DRDLPModel.PCDocuments" StoreEntitySet="DocumentSet">
       <EndProperty Name="PC">
@@ -710,13 +819,14 @@
       <EndProperty Name="Documents">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
+      <Condition ColumnName="PC_Id" IsNull="false" />
     </AssociationSetMapping>
-    <AssociationSetMapping Name="DocumentsUserAccess" TypeName="DRDLPModel.DocumentsUserAccess" StoreEntitySet="UserAccessSet">
+    <AssociationSetMapping Name="DocumentsUserAccess" TypeName="DRDLPModel.DocumentsUserAccess" StoreEntitySet="DocumentsUserAccess">
       <EndProperty Name="Documents">
         <ScalarProperty Name="Id" ColumnName="Documents_Id" />
       </EndProperty>
       <EndProperty Name="UserAccess">
-        <ScalarProperty Name="AccessType" ColumnName="AccessType" />
+        <ScalarProperty Name="AccessType" ColumnName="UserAccess_AccessType" />
       </EndProperty>
     </AssociationSetMapping>
     <AssociationSetMapping Name="UserUserAccess" TypeName="DRDLPModel.UserUserAccess" StoreEntitySet="UserUserAccess">
@@ -727,21 +837,23 @@
         <ScalarProperty Name="AccessType" ColumnName="UserAccesses_AccessType" />
       </EndProperty>
     </AssociationSetMapping>
-    <AssociationSetMapping Name="DocumentsUser" TypeName="DRDLPModel.DocumentsUser" StoreEntitySet="DocumentSet">
-      <EndProperty Name="User">
-        <ScalarProperty Name="Id" ColumnName="LastUserAccess_Id" />
-      </EndProperty>
+    <AssociationSetMapping Name="DocumentsUser" TypeName="DRDLPModel.DocumentsUser" StoreEntitySet="UserSet">
       <EndProperty Name="Documents">
+        <ScalarProperty Name="Id" ColumnName="LastAccessDocuments_Id" />
+      </EndProperty>
+      <EndProperty Name="User">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
+      <Condition ColumnName="LastAccessDocuments_Id" IsNull="false" />
     </AssociationSetMapping>
-    <AssociationSetMapping Name="DocumentsUser1" TypeName="DRDLPModel.DocumentsUser1" StoreEntitySet="DocumentSet">
-      <EndProperty Name="User">
-        <ScalarProperty Name="Id" ColumnName="LastUserAccessWithChanges_Id" />
-      </EndProperty>
+    <AssociationSetMapping Name="DocumentsUser1" TypeName="DRDLPModel.DocumentsUser1" StoreEntitySet="UserSet">
       <EndProperty Name="Documents">
+        <ScalarProperty Name="Id" ColumnName="LastChangedDocuments_Id" />
+      </EndProperty>
+      <EndProperty Name="User">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
+      <Condition ColumnName="LastChangedDocuments_Id" IsNull="false" />
     </AssociationSetMapping>
     <AssociationSetMapping Name="DocumentPathPC" TypeName="DRDLPModel.DocumentPathPC" StoreEntitySet="DocumentPathSet">
       <EndProperty Name="PC">
@@ -750,6 +862,7 @@
       <EndProperty Name="DocumentPath">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
+      <Condition ColumnName="PC_Id" IsNull="false" />
     </AssociationSetMapping>
     <AssociationSetMapping Name="DocumentDocumentPath" TypeName="DRDLPModel.DocumentDocumentPath" StoreEntitySet="DocumentPathSet">
       <EndProperty Name="Document">
@@ -766,6 +879,7 @@
       <EndProperty Name="AccessLog">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
+      <Condition ColumnName="Document_Id" IsNull="false" />
     </AssociationSetMapping>
     <AssociationSetMapping Name="UserAccessLog" TypeName="DRDLPModel.UserAccessLog" StoreEntitySet="AccessLogSet">
       <EndProperty Name="User">
@@ -774,6 +888,7 @@
       <EndProperty Name="AccessLog">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
+      <Condition ColumnName="User_Id" IsNull="false" />
     </AssociationSetMapping>
     <AssociationSetMapping Name="AccessLogPC" TypeName="DRDLPModel.AccessLogPC" StoreEntitySet="AccessLogSet">
       <EndProperty Name="PC">
@@ -782,6 +897,7 @@
       <EndProperty Name="AccessLog">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
+      <Condition ColumnName="PC_Id" IsNull="false" />
     </AssociationSetMapping>
     <AssociationSetMapping Name="DocumentPathAccessLog" TypeName="DRDLPModel.DocumentPathAccessLog" StoreEntitySet="AccessLogSet">
       <EndProperty Name="DocumentPath">
@@ -790,6 +906,7 @@
       <EndProperty Name="AccessLog">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
+      <Condition ColumnName="DocumentPath_Id" IsNull="false" />
     </AssociationSetMapping>
     <AssociationSetMapping Name="UserAccessAccessLog" TypeName="DRDLPModel.UserAccessAccessLog" StoreEntitySet="AccessLogSet">
       <EndProperty Name="UserAccess">
@@ -798,14 +915,24 @@
       <EndProperty Name="AccessLog">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
+      <Condition ColumnName="UserAccess_AccessType" IsNull="false" />
     </AssociationSetMapping>
-    <AssociationSetMapping Name="HardwareAccessLog" TypeName="DRDLPModel.HardwareAccessLog" StoreEntitySet="AccessLogSet">
+    <AssociationSetMapping Name="HardwareAccessLog" TypeName="DRDLPModel.HardwareAccessLog" StoreEntitySet="HardwareAccessLog">
       <EndProperty Name="Hardware">
         <ScalarProperty Name="Id" ColumnName="Hardware_Id" />
       </EndProperty>
       <EndProperty Name="AccessLog">
+        <ScalarProperty Name="Id" ColumnName="AccessLog_Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="DocumentDocumentVersionChange" TypeName="DRDLPModel.DocumentDocumentVersionChange" StoreEntitySet="DocumentVersionChangeSet">
+      <EndProperty Name="Document">
+        <ScalarProperty Name="Id" ColumnName="Document_Id" />
+      </EndProperty>
+      <EndProperty Name="DocumentVersionChange">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
+      <Condition ColumnName="Document_Id" IsNull="false" />
     </AssociationSetMapping>
   </EntityContainerMapping>
 </Mapping></edmx:Mappings>

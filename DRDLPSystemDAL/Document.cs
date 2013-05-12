@@ -16,17 +16,19 @@ namespace DRDLPSystemDAL
     {
         public Document()
         {
-            this.DocumentID = "\"\"";
             this.Version = 0;
+            this.DocumentPart = "\"\"";
             this.UserAccess = new HashSet<UserAccess>();
             this.DocumentPath = new HashSet<DocumentPath>();
             this.AccessLog = new HashSet<AccessLog>();
+            this.DocumentVersionChange = new HashSet<DocumentVersionChange>();
         }
     
-        public int Id { get; set; }
-        public string DocumentID { get; set; }
+        public long Id { get; set; }
+        public System.Guid DocumentID { get; set; }
         public System.DateTime LastChange { get; set; }
         public long Version { get; set; }
+        public string DocumentPart { get; set; }
     
         public virtual PC PC { get; set; }
         public virtual ICollection<UserAccess> UserAccess { get; set; }
@@ -34,5 +36,6 @@ namespace DRDLPSystemDAL
         public virtual User LastUserAccessWithChanges { get; set; }
         public virtual ICollection<DocumentPath> DocumentPath { get; set; }
         public virtual ICollection<AccessLog> AccessLog { get; set; }
+        public virtual ICollection<DocumentVersionChange> DocumentVersionChange { get; set; }
     }
 }

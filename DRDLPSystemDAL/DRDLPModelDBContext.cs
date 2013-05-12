@@ -6,17 +6,11 @@ using System.Text;
 
 namespace DRDLPSystemDAL
 {
-    public partial class DRDLPModelDBContext : IDisposable
+	public partial class DRDLPModelDBContext : IDisposable
     {
         private readonly DRDLPModelContainer _container;
 
 		#region Constructors
-		public DRDLPModelDBContext()
-        {
-            _container = new DRDLPModelContainer();
-	        _container.Database.CreateIfNotExists();
-        }
-
 		public DRDLPModelDBContext(string connectionString)
 		{
 			if (string.IsNullOrEmpty(connectionString))
@@ -44,7 +38,7 @@ namespace DRDLPSystemDAL
 		public static string GetSha512Sum(string inputData)
         {
             if (string.IsNullOrEmpty(inputData))
-                throw new ArgumentException("inputData can`t be mepty or null");
+                throw new ArgumentException("inputData can`t be empty or null");
 
             using (var sha256 = SHA512.Create())
             {

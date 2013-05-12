@@ -18,6 +18,7 @@ namespace DRDLPSystemDAL
         {
             this.Valid = true;
             this.PCHardwareBasedID = "\"\"";
+            this.Name = "\"\"";
             this.Hardware = new HashSet<Hardware>();
             this.Users = new HashSet<User>();
             this.Documents = new HashSet<Document>();
@@ -28,6 +29,7 @@ namespace DRDLPSystemDAL
         public int Id { get; set; }
         public bool Valid { get; set; }
         public string PCHardwareBasedID { get; set; }
+        public string Name { get; set; }
     
         public virtual ICollection<Hardware> Hardware { get; set; }
         public virtual ICollection<User> Users { get; set; }

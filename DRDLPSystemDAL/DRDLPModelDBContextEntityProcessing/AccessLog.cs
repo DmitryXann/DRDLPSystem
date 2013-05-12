@@ -6,36 +6,7 @@ namespace DRDLPSystemDAL
 {
 	public partial class DRDLPModelDBContext
 	{
-		public void AddAccessLog(AccessLog accessLog)
-		{
-			if (accessLog == null)
-				throw new ArgumentNullException("accessLog");
-
-			if (accessLog.DocumentPath == null)
-				throw new ArgumentNullException("accessLog.DocumentPath");
-
-			if (accessLog.Document == null)
-				throw new ArgumentNullException("accessLog.Document");
-
-			if (accessLog.Hardware == null)
-				throw new ArgumentNullException("accessLog.Hardware");
-
-			if (accessLog.PC == null)
-				throw new ArgumentNullException("accessLog.PC");
-
-			if (accessLog.User == null)
-				throw new ArgumentNullException("accessLog.User");
-
-			if (accessLog.UserAccess == null)
-				throw new ArgumentNullException("accessLog.UserAccess");
-
-			if (accessLog.AccessDateTime == DateTime.MinValue)
-				accessLog.AccessDateTime = DateTime.Now;
-
-			_container.AccessLogSet.Add(accessLog);
-		}
-
-		public void AddAccessLog(DocumentPath documentPath, Document document, Hardware hardware, PC pc, User user, 
+		public void AddAccessLog(DocumentPath documentPath, Document document, IEnumerable<Hardware> hardwareCollection, PC pc, User user, 
 			UserAccess userAccess, DateTime dateTime, AccessLogAccessType accessType, bool logEntryProcessed = false)
 		{
 			if (documentPath == null)
@@ -44,7 +15,7 @@ namespace DRDLPSystemDAL
 			if (document == null)
 				throw new ArgumentNullException("document");
 
-			if (hardware == null)
+			if (hardwareCollection == null)
 				throw new ArgumentNullException("hardware");
 
 			if (pc == null)
@@ -56,37 +27,39 @@ namespace DRDLPSystemDAL
 			if (userAccess == null)
 				throw new ArgumentNullException("userAccess");
 
-			if (!_container.DocumentSet.Contains(document))
+			if (!_container.DocumentSet.Any(el => el.Id == document.Id))
 				throw new ArgumentException("document do not contains in DB");
 
-			if (!_container.DocumentPathSet.Contains(documentPath))
+			if (!_container.DocumentPathSet.Any(el => el.Id == documentPath.Id))
 				throw new ArgumentException("documentPath do not contains in DB");
 
-			if (!_container.HardwareSet.Contains(hardware))
-				throw new ArgumentException("hardware do not contains in DB");
+			if (!_container.HardwareSet.Any(el => hardwareCollection.Any(elem => elem.Id == el.Id)))
+				throw new ArgumentException("all hardware do not contains in DB");
 
-			if (!_container.PCSet.Contains(pc))
+			if (!_container.PCSet.Any(el => el.Id == pc.Id))
 				throw new ArgumentException("pc do not contains in DB");
 
-			if (!_container.UserSet.Contains(user))
+			if (!_container.UserSet.Any(el => el.Id == user.Id))
 				throw new ArgumentException("user do not contains in DB");
 
-			if (!_container.UserAccessSet.Contains(userAccess))
+			if (!_container.UserAccessSet.Any(el => el.AccessType == userAccess.AccessType))
 				throw new ArgumentException("userAccess do not contains in DB");
-
-
-			_container.AccessLogSet.Add(new AccessLog
+			var accessLog = new AccessLog
 				{
 					AccessDateTime = dateTime == DateTime.MinValue ? DateTime.Now : dateTime,
 					AccessType = accessType,
 					Document = _container.DocumentSet.Attach(document),
 					DocumentPath = _container.DocumentPathSet.Attach(documentPath),
-					Hardware = _container.HardwareSet.Attach(hardware),
 					PC = _container.PCSet.Attach(pc),
 					User = _container.UserSet.Attach(user),
 					UserAccess = _container.UserAccessSet.Attach(userAccess),
 					LogEntryProcessed = logEntryProcessed
-				});
+				};
+
+			foreach (var hardware in hardwareCollection)
+			{
+				accessLog.Hardware.Add(_container.HardwareSet.Attach(hardware));
+			}
 		}
 
 		public void ChangeLogEntryProcessedFlag(AccessLog accessLog, bool logEntryProcessed = true)
@@ -112,17 +85,6 @@ namespace DRDLPSystemDAL
 			selectedAccessLog.LogEntryProcessed = logEntryProcessed;
 		}
 
-
-		public AccessLog GetAccessLogByID(int accessLogId)
-		{
-			return _container.AccessLogSet.FirstOrDefault(el => el.Id == accessLogId);
-		}
-
-		public IEnumerable<AccessLog> GetAllAccessLogs()
-		{
-			return _container.AccessLogSet.ToArray();
-		}  
-
 		public IEnumerable<AccessLog> GetAllAccessLogByType(AccessLogAccessType type)
 		{
 			return _container.AccessLogSet.Where(el => el.AccessType == type).ToArray();
@@ -131,11 +93,6 @@ namespace DRDLPSystemDAL
 		public IEnumerable<AccessLog> GetAllNotProcessedLogEntries()
 		{
 			return _container.AccessLogSet.Where(el => !el.LogEntryProcessed).ToArray();
-		}
-
-		public long GetAccessLogCount()
-		{
-			return _container.AccessLogSet.LongCount();
 		}
 	}
 }

@@ -9,24 +9,6 @@ namespace DRDLPSystemDAL
 		/// <summary>
 		/// Use to add new administrator
 		/// </summary>
-		/// <param name="administrator">administrators instance, administrator password stores in db in sha512 sum</param>
-		public void AddAdministrator(Administrator administrator)
-		{
-			if (administrator == null)
-				throw new ArgumentNullException("administrator");
-
-			if (_container.AdministratorSet.Contains(administrator))
-				throw new ArgumentException("DB already contains this administrator");
-
-			administrator.Login = administrator.Login.ToLower().Trim();
-			administrator.Password = GetSha512Sum(administrator.Password.ToLower().Trim());
-
-			_container.AdministratorSet.Add(administrator);
-		}
-
-		/// <summary>
-		/// Use to add new administrator
-		/// </summary>
 		/// <param name="login">administrator login</param>
 		/// <param name="password">administrator password, it stores in db in sha512 sum</param>
 		public void AddAdministrator(string login, string password)
@@ -38,17 +20,6 @@ namespace DRDLPSystemDAL
 				throw new ArgumentException("Administrator with this login already exists");
 
 			_container.AdministratorSet.Add(new Administrator { Login = login.ToLower().Trim(), Password = GetSha512Sum(password.ToLower().Trim()) });
-		}
-
-		public void RemoveAdministrator(Administrator administrator)
-		{
-			if (administrator == null)
-				throw new ArgumentNullException("administrator");
-
-			if (!_container.AdministratorSet.Contains(administrator))
-				throw new ArgumentException("administrator do not contains in DB");
-
-			_container.AdministratorSet.Remove(_container.AdministratorSet.Attach(administrator));
 		}
 
 		public void RemoveAdministrator(string login, string password)
@@ -63,14 +34,6 @@ namespace DRDLPSystemDAL
 				throw new ArgumentException("Administrator with this login and password do not exists");
 
 			_container.AdministratorSet.Remove(selectedAdministrator);
-		}
-
-		public Administrator AttachAdministrator(Administrator administrator)
-		{
-			if (administrator == null)
-				throw new ArgumentNullException("administrator");
-
-			return _container.AdministratorSet.Attach(administrator);
 		}
 
 		public void ChangeAdministratorLoginAndOrPassword(Administrator administrator, string newLogin, string newPassword)
@@ -119,11 +82,6 @@ namespace DRDLPSystemDAL
 			return selectedAdministrator.Password;
 		}
 
-		public Administrator GetAdministratorByID(int administratorId)
-		{
-			return _container.AdministratorSet.FirstOrDefault(el => el.Id == administratorId);
-		}
-
 		public Administrator GetAdministratorByLogin(string login)
 		{
 			if (string.IsNullOrEmpty(login))
@@ -137,9 +95,11 @@ namespace DRDLPSystemDAL
 			if (string.IsNullOrEmpty(login) || string.IsNullOrEmpty(password))
 				throw new ArgumentException("login and password can`t be empty or null");
 
+			var encryptedPassword = GetSha512Sum(password.ToLower().Trim());
+
 			return _container.AdministratorSet.FirstOrDefault(el =>
 															   (el.Login.ToLower().Trim() == login.ToLower().Trim()) &&
-															   (el.Password.ToLower().Trim() == password.ToLower().Trim()));
+															   (el.Password.ToLower().Trim() == encryptedPassword.Trim()));
 		}
 
 		public bool IsAdministratorWithLoginExists(string login)
@@ -150,19 +110,9 @@ namespace DRDLPSystemDAL
 			return _container.AdministratorSet.Any(el => el.Login.ToLower().Trim() == login.ToLower().Trim());
 		}
 
-		public IEnumerable<Administrator> GetAllAdministrators()
-		{
-			return _container.AdministratorSet.ToArray();
-		}
-
 		public IEnumerable<Administrator> GetAllAdministratorsWithNeedToChangePassword()
 		{
 			return _container.AdministratorSet.Where(el => el.NeedsToChangePassword).ToArray();
 		} 
-
-		public long GetAdministratorsCount()
-		{
-			return _container.AdministratorSet.LongCount();
-		}
 	}
 }
