@@ -28,33 +28,32 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.DRDLPServiceProcessInstaller = new System.ServiceProcess.ServiceProcessInstaller();
-			this.DRDLPServiceInstaller = new System.ServiceProcess.ServiceInstaller();
+			this.DRDLPWindowsServiceServiceProcessInstaller = new System.ServiceProcess.ServiceProcessInstaller();
+			this.DRDLPWindowsServiceInstaller = new System.ServiceProcess.ServiceInstaller();
 			// 
-			// DRDLPServiceProcessInstaller
+			// DRDLPWindowsServiceServiceProcessInstaller
 			// 
-			this.DRDLPServiceProcessInstaller.Account = System.ServiceProcess.ServiceAccount.LocalSystem;
-			this.DRDLPServiceProcessInstaller.Password = null;
-			this.DRDLPServiceProcessInstaller.Username = null;
+			this.DRDLPWindowsServiceServiceProcessInstaller.Account = System.ServiceProcess.ServiceAccount.LocalSystem;
+			this.DRDLPWindowsServiceServiceProcessInstaller.Password = null;
+			this.DRDLPWindowsServiceServiceProcessInstaller.Username = null;
 			// 
-			// DRDLPServiceInstaller
+			// DRDLPWindowsServiceInstaller
 			// 
-			this.DRDLPServiceInstaller.Description = "DRDLPService";
-			this.DRDLPServiceInstaller.DisplayName = "DRDLPService";
-			this.DRDLPServiceInstaller.ServiceName = "DRDLPService";
-			this.DRDLPServiceInstaller.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
+			this.DRDLPWindowsServiceInstaller.Description = "DRDLPWindowsService";
+			this.DRDLPWindowsServiceInstaller.DisplayName = "DRDLPWindowsService";
+			this.DRDLPWindowsServiceInstaller.ServiceName = "DRDLPService";
 			// 
 			// ProjectInstaller
 			// 
 			this.Installers.AddRange(new System.Configuration.Install.Installer[] {
-            this.DRDLPServiceProcessInstaller,
-            this.DRDLPServiceInstaller});
+            this.DRDLPWindowsServiceServiceProcessInstaller,
+            this.DRDLPWindowsServiceInstaller});
 
 		}
 
 		#endregion
 
-		private System.ServiceProcess.ServiceProcessInstaller DRDLPServiceProcessInstaller;
-		private System.ServiceProcess.ServiceInstaller DRDLPServiceInstaller;
+		private System.ServiceProcess.ServiceInstaller DRDLPWindowsServiceInstaller;
+		public System.ServiceProcess.ServiceProcessInstaller DRDLPWindowsServiceServiceProcessInstaller;
 	}
 }
